@@ -17,7 +17,7 @@ public class MotorDriveTesting extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         List<DcMotorEx> motorIds = DriveConfig.MOTOR_IDS;
-        int i = 0;
+        int i = 1;
     }
 }
 
