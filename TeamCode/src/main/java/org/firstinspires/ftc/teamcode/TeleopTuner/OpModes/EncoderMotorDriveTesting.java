@@ -15,7 +15,6 @@ public class EncoderMotorDriveTesting extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-
         telemetry.addLine("Move every motor that you want to test forward a significant amount");
         telemetry.addLine();
         telemetry.addLine("Check with your coder that he has correctly declared encoders for this");
