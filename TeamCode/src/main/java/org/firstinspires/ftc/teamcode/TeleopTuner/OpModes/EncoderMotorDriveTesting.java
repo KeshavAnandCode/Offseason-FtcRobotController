@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.TeleopTuner.BehindTheScenes.DriveConfig;
 @TeleOp
 public class EncoderMotorDriveTesting extends LinearOpMode {
 
-
     @Override
     public void runOpMode() throws InterruptedException {
 
