@@ -32,7 +32,6 @@ public class DriveConfig {
         //back left motor ID
         add(hardwareMap.get(DcMotorEx.class, "replaceThis4"));
         //back right motor ID
-
         //TODO: Add any more motors to this list if you have them
         //Example: add(hardwareMap.get(DcMotorEx.class, "servoArm"));
     }};
