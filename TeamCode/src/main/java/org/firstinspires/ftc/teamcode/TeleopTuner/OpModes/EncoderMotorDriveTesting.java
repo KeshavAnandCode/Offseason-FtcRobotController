@@ -27,7 +27,7 @@ public class EncoderMotorDriveTesting extends LinearOpMode {
                 if (DriveConfig.ENCODER_IDS.get(i)==hardwareMap.get(DcMotorEx.class,"")){
                     idle();
                 } else {
-                    telemetry.addData(DriveConfig.MOTOR_NAMES.get(i)+" Position: ",DriveConfig.ENCODER_IDS.get(i).getCurrentPosition());
+                    telemetry.addData(DriveConfig.MOTOR_NAMES.get(i)+" Position ",DriveConfig.ENCODER_IDS.get(i).getCurrentPosition());
                     telemetry.addData(
                      DriveConfig.MOTOR_NAMES.get(i)+
                         DriveConfig.ENCODER_IDS.get(i).getController()+
@@ -35,6 +35,11 @@ public class EncoderMotorDriveTesting extends LinearOpMode {
                         DriveConfig.MOTOR_IDS.get(i).getPortNumber()
                     );
                 }
+            }
+            telemetry.addLine("Press B on Gamepad 1 to end testing");
+            telemetry.update();
+            if (gamepad1.b){
+                motorTelemetry();
             }
 
         }
@@ -49,6 +54,21 @@ public class EncoderMotorDriveTesting extends LinearOpMode {
            return "NA";
        }
 
+    }
+    private void motorTelemetry(){
+        for (int i = 1; i<=DriveConfig.ENCODER_IDS.size();i++){
+            if (DriveConfig.ENCODER_IDS.get(i)==hardwareMap.get(DcMotorEx.class,"")){
+                idle();
+            } else {
+                telemetry.addData(DriveConfig.MOTOR_NAMES.get(i),calculateEncoder(DriveConfig.ENCODER_IDS.get(i)));
+                telemetry.addData(
+                        DriveConfig.MOTOR_NAMES.get(i)+
+                        DriveConfig.ENCODER_IDS.get(i).getController()+
+                        "Port ",
+                        DriveConfig.MOTOR_IDS.get(i).getPortNumber()
+                );
+            }
+        }
     }
 }
 
