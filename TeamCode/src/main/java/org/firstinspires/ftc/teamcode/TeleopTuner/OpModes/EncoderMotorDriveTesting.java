@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.TeleopTuner.OpModes;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.TeleopTuner.BehindTheScenes.DriveConfig;
+import org.firstinspires.ftc.teamcode.TeleopTuner.BehindTheScenes.MotorConfig;
 
 
 @TeleOp
@@ -23,16 +21,16 @@ public class EncoderMotorDriveTesting extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            for (int i = 1; i<=DriveConfig.ENCODER_IDS.size();i++){
-                if (DriveConfig.ENCODER_IDS.get(i)==hardwareMap.get(DcMotorEx.class,"")){
+            for (int i = 1; i<= MotorConfig.ENCODER_IDS.size(); i++){
+                if (MotorConfig.ENCODER_IDS.get(i)==hardwareMap.get(DcMotorEx.class,"")){
                     idle();
                 } else {
-                    telemetry.addData(DriveConfig.MOTOR_NAMES.get(i)+" Position ",DriveConfig.ENCODER_IDS.get(i).getCurrentPosition());
+                    telemetry.addData(MotorConfig.MOTOR_NAMES.get(i)+" Position ", MotorConfig.ENCODER_IDS.get(i).getCurrentPosition());
                     telemetry.addData(
-                     DriveConfig.MOTOR_NAMES.get(i)+
-                        DriveConfig.ENCODER_IDS.get(i).getController()+
+                     MotorConfig.MOTOR_NAMES.get(i)+
+                        MotorConfig.ENCODER_IDS.get(i).getController()+
                         "Port ",
-                        DriveConfig.MOTOR_IDS.get(i).getPortNumber()
+                        MotorConfig.MOTOR_IDS.get(i).getPortNumber()
                     );
                 }
             }
@@ -56,16 +54,16 @@ public class EncoderMotorDriveTesting extends LinearOpMode {
 
     }
     private void motorTelemetry(){
-        for (int i = 1; i<=DriveConfig.ENCODER_IDS.size();i++){
-            if (DriveConfig.ENCODER_IDS.get(i)==hardwareMap.get(DcMotorEx.class,"")){
+        for (int i = 1; i<= MotorConfig.ENCODER_IDS.size(); i++){
+            if (MotorConfig.ENCODER_IDS.get(i)==hardwareMap.get(DcMotorEx.class,"")){
                 idle();
             } else {
-                telemetry.addData(DriveConfig.MOTOR_NAMES.get(i),calculateEncoder(DriveConfig.ENCODER_IDS.get(i)));
+                telemetry.addData(MotorConfig.MOTOR_NAMES.get(i),calculateEncoder(MotorConfig.ENCODER_IDS.get(i)));
                 telemetry.addData(
-                        DriveConfig.MOTOR_NAMES.get(i)+
-                        DriveConfig.ENCODER_IDS.get(i).getController()+
+                        MotorConfig.MOTOR_NAMES.get(i)+
+                        MotorConfig.ENCODER_IDS.get(i).getController()+
                         "Port ",
-                        DriveConfig.MOTOR_IDS.get(i).getPortNumber()
+                        MotorConfig.MOTOR_IDS.get(i).getPortNumber()
                 );
             }
         }

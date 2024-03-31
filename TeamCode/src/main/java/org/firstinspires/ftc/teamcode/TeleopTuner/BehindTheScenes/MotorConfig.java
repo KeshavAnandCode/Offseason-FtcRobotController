@@ -3,15 +3,12 @@ package org.firstinspires.ftc.teamcode.TeleopTuner.BehindTheScenes;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
-import java.lang.reflect.Field;
+
 import java.util.ArrayList;
 import java.util.List;
 @Disabled
-public class DriveConfig {
+public class MotorConfig {
 
     //TODO: Update the below string based on your odometry pods
     // Your options are "none", "two", or "three", depending on your odo pod setup

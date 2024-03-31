@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.TeleopTuner.BehindTheScenes.DriveConfig;
+import org.firstinspires.ftc.teamcode.TeleopTuner.BehindTheScenes.MotorConfig;
 
 
 @TeleOp
@@ -24,8 +24,8 @@ public class ManualMotorDriveTesting extends LinearOpMode {
 
         if (opModeIsActive()) {
             if (!AUTO_TEST) {
-                for (int i = 1; i <= DriveConfig.MOTOR_IDS.size(); i++) {
-                    telemetry.addLine("Test Motor" + DriveConfig.MOTOR_NAMES.get(i) + "?");
+                for (int i = 1; i <= MotorConfig.MOTOR_IDS.size(); i++) {
+                    telemetry.addLine("Test Motor" + MotorConfig.MOTOR_NAMES.get(i) + "?");
                     telemetry.addLine();
                     telemetry.addLine("Using Gamepad 1...");
                     telemetry.addLine("A/Cross = Yes, B/Circle = No");
@@ -47,15 +47,15 @@ public class ManualMotorDriveTesting extends LinearOpMode {
                         idle();
                     }
                     if (pressedA) {
-                        testMotor(DriveConfig.MOTOR_IDS.get(i));
+                        testMotor(MotorConfig.MOTOR_IDS.get(i));
                     }
                 }
             }
             if (AUTO_TEST){
-                for (int i = 1; i <= DriveConfig.MOTOR_IDS.size(); i++) {
-                    telemetry.addLine("Testing Motor" + DriveConfig.MOTOR_NAMES.get(i));
+                for (int i = 1; i <= MotorConfig.MOTOR_IDS.size(); i++) {
+                    telemetry.addLine("Testing Motor" + MotorConfig.MOTOR_NAMES.get(i));
                     telemetry.update();
-                    testMotor(DriveConfig.MOTOR_IDS.get(i));
+                    testMotor(MotorConfig.MOTOR_IDS.get(i));
                 }
             }
         }
