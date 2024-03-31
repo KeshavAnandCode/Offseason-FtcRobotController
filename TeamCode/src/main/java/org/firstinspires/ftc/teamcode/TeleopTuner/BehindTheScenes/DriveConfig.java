@@ -47,7 +47,6 @@ public class DriveConfig {
         //FEEL FREE TO CHANGE THESE MOTOR NAMES
         //TODO: Add any more motors to this list if you have them.
         // This list must be the same size as the list above and the order must correspond
-
         //Example: add("servoArm");
 
     }};
