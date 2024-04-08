@@ -19,26 +19,22 @@ public class DriveConfig {
 
     //TODO: Change the motor declaration ID's
 
-    public static final List<DcMotorEx> MOTOR_IDS =new ArrayList<DcMotorEx>(){{
-        add(hardwareMap.get(DcMotorEx.class,""));
-        //TODO: DO NOT CHANGE/DELETE THE ABOVE LINE. IT IS USED FOR INDEX CONVENIENCE
-        //Also, do not change the order of the drivetrain motors. This ia very important.
 
-        add(hardwareMap.get(DcMotorEx.class, "replaceThis1"));
+
+      public static DcMotorEx MOTOR_1 =  hardwareMap.get(DcMotorEx.class, "replaceThis1");
         //front left motor ID
-        add(hardwareMap.get(DcMotorEx.class, "replaceThis2"));
+      public static DcMotorEx MOTOR_2 = hardwareMap.get(DcMotorEx.class, "replaceThis2");
         //front right motor ID
-        add(hardwareMap.get(DcMotorEx.class, "replaceThis3"));
+      public static DcMotorEx MOTOR_3 = hardwareMap.get(DcMotorEx.class, "replaceThis3");
         //back left motor ID
-        add(hardwareMap.get(DcMotorEx.class, "replaceThis4"));
+      public static DcMotorEx MOTOR_4 = hardwareMap.get(DcMotorEx.class, "replaceThis4");
         //back right motor ID
+  
         //TODO: Add any more motors to this list if you have them
         //Example: add(hardwareMap.get(DcMotorEx.class, "servoArm"));
-    }};
+
 
     public static final List<String> MOTOR_NAMES = new ArrayList<String>(){{
-        add("");
-        //TODO: DO NOT DELETE, CHANGE, OR MODIFY THE ABOVE LINE. IT IS USED FOR INDEXING
         add("frontLeftMotor");
         add("frontRightMotor");
         add("backLeftMotor");
