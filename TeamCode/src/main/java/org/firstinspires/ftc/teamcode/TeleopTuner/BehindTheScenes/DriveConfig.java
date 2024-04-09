@@ -31,7 +31,7 @@ public class DriveConfig {
         //back right motor ID
   
         //TODO: Add any more motors to this list if you have them
-        //Example: add(hardwareMap.get(DcMotorEx.class, "servoArm"));
+        //Example: public static DcMOtorEX MOTOR_5 = hardwareMap.get(DcMotorEx.class, "servoArm"));
 
 
     public static final List<String> MOTOR_NAMES = new ArrayList<String>(){{
