@@ -45,7 +45,6 @@ public class DriveConfig {
         //Example: add("servoArm");
     }};
 
-
     public static final List<DcMotorEx> ENCODER_IDS =new ArrayList<DcMotorEx>(){{
         add(hardwareMap.get(DcMotorEx.class,""));
         //TODO: DO NOT CHANGE/DELETE THE ABOVE LINE. IT IS USED FOR INDEX CONVENIENCE
