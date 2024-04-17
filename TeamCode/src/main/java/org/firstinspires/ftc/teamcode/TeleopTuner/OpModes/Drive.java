@@ -13,6 +13,7 @@ import java.util.Objects;
 public class Drive extends LinearOpMode {
 
     public static String CURVE = "LINEAR";
+    public static double DEGREE = 2;
     @Override
 
     public void runOpMode() throws InterruptedException {
@@ -67,18 +68,10 @@ public class Drive extends LinearOpMode {
     }
     public static double JoystickCurve (double input) {
         if (Objects.equals(CURVE, "LINEAR")){
-            return input;
-        } else if (Objects.equals(CURVE,"SQUARED")){
-            double returner = input*input;
-            if (input<0){
-                returner*=-1;
-            }
-            return returner;
-        } else if (Objects.equals(CURVE,"CUBED")){
-            return Math.pow(input,3);
-        } else if (Objects.equals(CURVE,"SQRT")){
-            double returner = (Math.sqrt(Math.abs(input)));
-            if (input<0){
+            return input*DEGREE;
+        } else if (Objects.equals(CURVE,"POWER")){
+            double returner = Math.pow(input, DEGREE);
+            if (input<0&&returner>0){
                 returner*=-1;
             }
             return returner;
