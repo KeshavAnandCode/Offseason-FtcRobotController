@@ -75,8 +75,23 @@ public class Drive extends LinearOpMode {
                 returner*=-1;
             }
             return returner;
-        } else if (Objects.equals(CURVE,"CUSTOM")){
-            return 0;
+        } else if (Objects.equals(CURVE,"WIDE")){
+            if (Math.abs(input)<0.5){
+              double returnner = Math.pow((2*input), DEGREE);
+              returner = returnner/2;
+              if (input<0&&returnner>0){
+                returner *= -1;
+              }
+              return returnner;
+            } else {
+              double returner = Math.pow(((2*Math.abs(input))-1),(1/DEGREE));
+              returner = returner/2;
+              returner +=0.5;
+              if (input<0&&returner>0){
+                returner*=-1;
+              }
+              return returner;
+            }
         }
         return input;
     }
