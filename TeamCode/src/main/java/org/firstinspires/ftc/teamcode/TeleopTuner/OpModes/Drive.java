@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.TeleopTuner.OpModes;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.teamcode.TeleopTuner.BehindTheScenes.Robot;
 
 import java.util.Objects;
 @Config
@@ -14,34 +14,34 @@ public class Drive extends LinearOpMode {
 
     public static String CURVE = "LINEAR";
     public static double DEGREE = 2;
+
+    Robot robot;
+
+
+    GamepadEx g1 = new GamepadEx(gamepad1);
+    GamepadEx g2 = new GamepadEx(gamepad2);
+
+
     @Override
 
     public void runOpMode() throws InterruptedException {
         //Initialization Code Goes Here
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
-        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot = new Robot(hardwareMap);
+
 
         waitForStart();
 
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
+            //Teleop Code Goes Here
 
-            double rx = JoystickCurve(gamepad1.left_stick_x);
-            double x = JoystickCurve(gamepad1.right_stick_x);
-            double y = JoystickCurve(-gamepad1.right_stick_y);
+
+
+            double rx = JoystickCurve(g1.getLeftX());
+            double x = JoystickCurve(g1.getRightX());
+            double y = JoystickCurve(g1.getRightY());
 
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
             double frontLeftPower = (y + x + rx) / denominator;
@@ -50,19 +50,20 @@ public class Drive extends LinearOpMode {
             double backRightPower = (y + x - rx) / denominator;
 
 
+
             telemetry.addLine("FrontLeftPower: "+frontLeftPower);
             telemetry.addLine("FrontRightPower: "+frontRightPower);
             telemetry.addLine("BackLeftPower: "+backLeftPower);
             telemetry.addLine("BackLeftPower: "+backRightPower);
+
+
             telemetry.update();
 
-            frontLeftMotor.setPower(frontLeftPower);
-            backLeftMotor.setPower(backLeftPower);
-            frontRightMotor.setPower(frontRightPower);
-            backRightMotor.setPower(backRightPower);
+            robot.frontLeftMotor.setPower(frontLeftPower);
+            robot.backLeftMotor.setPower(backLeftPower);
+            robot.frontRightMotor.setPower(frontRightPower);
+            robot.backRightMotor.setPower(backRightPower);
 
-
-            //Teleop Code Goes Here
 
         }
     }
@@ -77,12 +78,12 @@ public class Drive extends LinearOpMode {
             return returner;
         } else if (Objects.equals(CURVE,"WIDE")){
             if (Math.abs(input)<0.5){
-              double returnner = Math.pow((2*input), DEGREE);
-              returner = returnner/2;
-              if (input<0&&returnner>0){
+              double returner = Math.pow((2*input), DEGREE);
+              returner = returner/2;
+              if (input<0&&returner>0){
                 returner *= -1;
               }
-              return returnner;
+              return returner;
             } else {
               double returner = Math.pow(((2*Math.abs(input))-1),(1/DEGREE));
               returner = returner/2;
