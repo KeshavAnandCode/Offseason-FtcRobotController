@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OldOpModes;
 
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -32,6 +33,7 @@ public class HangReset extends LinearOpMode {
         DcMotor linearActuator = hardwareMap.dcMotor.get("linearActuator");
         DistanceSensor dist = hardwareMap.get(DistanceSensor.class,"dist");
         RevBlinkinLedDriver lights = hardwareMap.get(RevBlinkinLedDriver.class,"lights");
+
         int count = 2;
         double x = 0;
         double rightLinearSlidePos=-288.87;

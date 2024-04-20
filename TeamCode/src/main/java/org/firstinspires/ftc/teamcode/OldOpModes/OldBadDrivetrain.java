@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.OldOpModes;
 
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.arcrobotics.ftclib.gamepad.ToggleButtonReader;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -65,10 +68,15 @@ public class OldBadDrivetrain extends LinearOpMode {
         double colorRuntime = 0.0;
         double colorWaittime = 0.0;
         boolean waitOver = false;
+        boolean mosaicMoverToggle = false;
         double aRunTime = 0.0;
         double bRunTime = 0.0;
         double mRunTime = 0.0;
         double nRunTime = 0.0;
+
+        GamepadEx g2 = new GamepadEx(gamepad2);
+
+
         linearSlideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         linearSlideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMove.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -94,6 +102,12 @@ public class OldBadDrivetrain extends LinearOpMode {
         // See the note about this earlier on this page.
 
         boolean hello = false;
+
+        ToggleButtonReader mosaicToggle = new ToggleButtonReader(
+                g2, GamepadKeys.Button.START
+        );
+        double mmRt =-5.0;
+
         waitForStart();
 
 
@@ -318,13 +332,21 @@ public class OldBadDrivetrain extends LinearOpMode {
             if (gamepad1.start) {
                 droneLauncher.setPower(1);
             }
-            if (gamepad2.start){
+
+
+            if(mosaicToggle.getState()){
                 mosaicMover.setPower(1);
-            } else if (gamepad2.back){
-                mosaicMover.setPower(-1);
-            } else{
-                mosaicMover.setPower(0);
+            } else {
+                if (mosaicToggle.stateJustChanged()){
+                    mmRt = getRuntime();
+                }
+                if ((getRuntime()-mmRt)<1.5){
+                    mosaicMover.setPower(-1);
+                } else {
+                    mosaicMover.setPower(0);
+                }
             }
+            mosaicToggle.readValue();
 
             if (gamepad2.left_stick_y>0) {
                 intakeRotate.setPower(0.1);
