@@ -106,6 +106,9 @@ public class OldBadDrivetrain extends LinearOpMode {
         ToggleButtonReader mosaicToggle = new ToggleButtonReader(
                 g2, GamepadKeys.Button.START
         );
+        ToggleButtonReader servoHalf = new ToggleButtonReader(
+                g2, GamepadKeys.Button.BACK
+        );
         double mmRt =-5.0;
 
         waitForStart();
@@ -347,6 +350,11 @@ public class OldBadDrivetrain extends LinearOpMode {
                 }
             }
             mosaicToggle.readValue();
+
+
+            if(gamepad2.back){
+                pixelOut.setPosition(0.37);
+            }
 
             if (gamepad2.left_stick_y>0) {
                 intakeRotate.setPower(0.1);
