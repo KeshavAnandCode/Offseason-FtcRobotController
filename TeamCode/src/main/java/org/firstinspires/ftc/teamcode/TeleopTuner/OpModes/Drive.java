@@ -23,6 +23,9 @@ public class Drive extends LinearOpMode {
     public static double DEGREE = 1;
     public static String TELEMETRY = "COLOR_SENSORS";
 
+  
+    double g2XTimestamp = -800000;
+
     Robot robot;
 
 
@@ -33,6 +36,11 @@ public class Drive extends LinearOpMode {
         //Initialization Code Goes Here
 
         robot = new Robot(hardwareMap);
+
+        ButtonReader g2X = new ButtonReader(
+            robot.g2, GamepadKeys.Button.X
+        );
+
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
 
@@ -71,6 +79,36 @@ public class Drive extends LinearOpMode {
             robot.backLeftMotor.setPower(backLeftPower);
             robot.frontRightMotor.setPower(frontRightPower);
             robot.backRightMotor.setPower(backRightPower);
+
+
+            if (g2X.wasJustPressed()){
+              g2XTimestamp = getRuntime();
+            }
+            g2X.readValue();
+          
+            double g2XReleaseTime = getRuntime() - g2XTimestamp;
+ 
+            if (g2XTimestamp>=0){
+              if (g2XReleaseTime<0.2){
+                robot.pixelOut.setPosition(0);
+              } else if (g2XReleaseTime < 0.4) {
+                robot.pixelOut.setPosition(0.8);
+              } else if (g2XReleaseTime < 0.7) {
+                robot.pixelIn.setPower(0.77);
+              } else {
+                robot.pixelIn.setPower(0);
+                if (gamepad2.y){
+                  robot.pixelOut.setPosition(0);
+                }
+                g2XTimestamp = -800000;
+              }
+            }
+          
+
+            
+
+         
+            
 
 
         }

@@ -37,6 +37,8 @@ public class Robot {
     public DcMotorEx linearSlideRight;
     public DcMotorEx intakeMotor;
     public DcMotorEx lineearActuator;
+    public GamepadEx g1;
+    public GamepadEx g2;
 
     public Telemetry telemetry;
 
@@ -79,6 +81,9 @@ public class Robot {
         backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        g1 = new GamepadEx(gamepad1);
+        g2 = new GamepadEx(gamepad2);
 
 
     }
