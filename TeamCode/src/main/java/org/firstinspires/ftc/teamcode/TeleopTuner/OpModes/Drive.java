@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.TeleopTuner.OpModes;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.gamepad.ButtonReader;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -28,6 +31,11 @@ public class Drive extends LinearOpMode {
 
     Robot robot;
 
+    GamepadEx g2 = new GamepadEx(gamepad2);
+
+    GamepadEx g1 = new GamepadEx(gamepad1);
+
+
 
 
     @Override
@@ -38,7 +46,7 @@ public class Drive extends LinearOpMode {
         robot = new Robot(hardwareMap);
 
         ButtonReader g2X = new ButtonReader(
-            robot.g2, GamepadKeys.Button.X
+            g2, GamepadKeys.Button.X
         );
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());

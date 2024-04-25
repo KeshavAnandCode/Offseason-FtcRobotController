@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleopTuner.BehindTheScenes;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -37,8 +35,7 @@ public class Robot {
     public DcMotorEx linearSlideRight;
     public DcMotorEx intakeMotor;
     public DcMotorEx lineearActuator;
-    public GamepadEx g1;
-    public GamepadEx g2;
+
 
     public Telemetry telemetry;
 
@@ -82,8 +79,7 @@ public class Robot {
         frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        g1 = new GamepadEx(gamepad1);
-        g2 = new GamepadEx(gamepad2);
+
 
 
     }
