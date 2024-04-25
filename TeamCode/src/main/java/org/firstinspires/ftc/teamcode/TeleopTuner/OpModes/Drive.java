@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.TeleopTuner.OpModes;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -107,6 +106,7 @@ public class Drive extends LinearOpMode {
     }
     
     public List<String> ColorSensors() {
+        robot = new Robot(hardwareMap);
         NormalizedRGBA colors = robot.color1.getNormalizedColors();
         NormalizedRGBA colors2 = robot.color2.getNormalizedColors();
         String colorIn1 = "Undefined";
