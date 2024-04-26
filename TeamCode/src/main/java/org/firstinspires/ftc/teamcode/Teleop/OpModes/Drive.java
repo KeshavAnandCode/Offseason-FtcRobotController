@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleopTuner.OpModes;
+package org.firstinspires.ftc.teamcode.Teleop.OpModes;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -12,8 +12,8 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.TeleopTuner.BehindTheScenes.ColorSensorConstants;
-import org.firstinspires.ftc.teamcode.TeleopTuner.BehindTheScenes.Robot;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.ColorSensorConstants;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Robot;
 
 import java.util.ArrayList;
 import java.util.List;
