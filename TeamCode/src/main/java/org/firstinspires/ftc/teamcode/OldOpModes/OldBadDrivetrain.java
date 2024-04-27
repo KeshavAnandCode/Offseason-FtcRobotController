@@ -206,6 +206,7 @@ public class OldBadDrivetrain extends LinearOpMode {
 
 
 
+
             double rightOdoPos = (backRightMotor.getCurrentPosition() * -1);
             double leftOdoPos = (frontLeftMotor.getCurrentPosition());
             double sideOdoPos = (backLeftMotor.getCurrentPosition());
@@ -353,7 +354,7 @@ public class OldBadDrivetrain extends LinearOpMode {
 
 
             if(gamepad2.back){
-                pixelOut.setPosition(0.37);
+                pixelOut.setPosition(0.27);
             }
 
             if (gamepad2.left_stick_y>0) {
@@ -392,36 +393,7 @@ public class OldBadDrivetrain extends LinearOpMode {
 
 
 
-                if (gamepad1.right_bumper) {
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-                } else if (gamepad2.right_stick_x >= 0.5) {
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-                } else if (gamepad2.right_stick_x <= -0.5) {
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-                } else if (gamepad2.right_stick_y >= 0.5) {
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-                } else if (gamepad2.right_stick_y <= -0.5) {
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
-                } else if (fingers) {
 
-                    if (intendedColor == "red") {
-                        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_RED);
-                    } else if (intendedColor == "yellow") {
-                        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-                    } else if (intendedColor == "green") {
-                        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SKY_BLUE);
-                    }
-                } else if (colorIn1 == "white!") {
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
-                } else if (colorIn1 == "yellow!") {
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
-                } else if (colorIn1 == "purple!") {
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-                } else if (colorIn1 == "green!") {
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-                } else {
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_PARTY_PALETTE);
-                }
             
 
            

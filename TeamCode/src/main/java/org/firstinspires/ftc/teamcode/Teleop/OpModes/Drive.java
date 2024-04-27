@@ -6,13 +6,17 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.ColorSensorConstants;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.ColorSensors;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Robot;
 
 import java.util.ArrayList;
@@ -24,16 +28,18 @@ public class Drive extends LinearOpMode {
 
     public static String CURVE = "LINEAR";
     public static double DEGREE = 1;
-    public static String TELEMETRY = "COLOR_SENSORS";
+    public static int TELEMETRY = 0;
+    private static MultipleTelemetry tele;
 
-  
-    double g2XTimestamp = -800000;
+
+    double g2XTimestamp = 0;
 
     Robot robot;
 
-    GamepadEx g2 = new GamepadEx(gamepad2);
 
-    GamepadEx g1 = new GamepadEx(gamepad1);
+
+
+
 
 
 
@@ -41,7 +47,13 @@ public class Drive extends LinearOpMode {
     @Override
 
     public void runOpMode() throws InterruptedException {
+
+         tele = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         //Initialization Code Goes Here
+        GamepadEx g2 = new GamepadEx(gamepad2);
+
+        GamepadEx g1 = new GamepadEx(gamepad1);
 
         robot = new Robot(hardwareMap);
 
@@ -49,7 +61,6 @@ public class Drive extends LinearOpMode {
             g2, GamepadKeys.Button.X
         );
 
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
 
 
@@ -73,15 +84,25 @@ public class Drive extends LinearOpMode {
             double backRightPower = (y + x - rx) / denominator;
 
 
-            if (TELEMETRY=="MOTOR_POWER") {
-                telemetry.addLine("FrontLeftPower: " + frontLeftPower);
-                telemetry.addLine("FrontRightPower: " + frontRightPower);
-                telemetry.addLine("BackLeftPower: " + backLeftPower);
-                telemetry.addLine("BackLeftPower: " + backRightPower);
-
-
-                telemetry.update();
+            if (TELEMETRY==1) {
+                tele.addLine("FrontLeftPower: " + frontLeftPower);
+                tele.addLine("FrontRightPower: " + frontRightPower);
+                tele.addLine("BackLeftPower: " + backLeftPower);
+                tele.addLine("BackLeftPower: " + backRightPower);
+                tele.update();
             }
+
+            if (TELEMETRY==0){
+                tele.addLine("Use FTC Dash to select telmetry");
+                tele.addLine("1 = Motor Power");
+                tele.addLine("2 = Color Sensors");
+                tele.update();
+            }
+
+
+
+
+
 
             robot.frontLeftMotor.setPower(frontLeftPower);
             robot.backLeftMotor.setPower(backLeftPower);
@@ -96,7 +117,7 @@ public class Drive extends LinearOpMode {
           
             double g2XReleaseTime = getRuntime() - g2XTimestamp;
  
-            if (g2XTimestamp>=0){
+            if (getRuntime()>=1&&g2XTimestamp>=0){
               if (g2XReleaseTime<0.2){
                 robot.pixelOut.setPosition(0);
               } else if (g2XReleaseTime < 0.4) {
@@ -111,6 +132,23 @@ public class Drive extends LinearOpMode {
                 g2XTimestamp = -800000;
               }
             }
+            List<String> colorOutput = ColorSensors.getInstance().colors(robot);
+            lightsFunction(gamepad2,gamepad2.a, colorOutput);
+
+            if (TELEMETRY==2){
+                tele.addLine(colorOutput.get(3));
+                tele.addLine(colorOutput.get(4));
+                tele.addLine(colorOutput.get(5));
+                tele.addLine(colorOutput.get(6)+", "+colorOutput.get(7)+ ", " + colorOutput.get(8));
+                tele.addLine();
+                tele.addLine(colorOutput.get(9));
+                tele.addLine(colorOutput.get(10));
+                tele.addLine(colorOutput.get(11));
+                tele.addLine(colorOutput.get(12)+", "+colorOutput.get(13)+ ", " + colorOutput.get(14 ));
+
+                tele.update();
+            }
+
           
 
             
@@ -151,132 +189,37 @@ public class Drive extends LinearOpMode {
         return input;
     }
     
-    public List<String> ColorSensors() {
+
+    public void lightsFunction (Gamepad gamepad, boolean intaking, List<String> colorSensorList){
         robot = new Robot(hardwareMap);
-        NormalizedRGBA colors = robot.color1.getNormalizedColors();
-        NormalizedRGBA colors2 = robot.color2.getNormalizedColors();
-        String colorIn1 = "Undefined";
-        String colorIn2 = "Undefined";
-        int numberInOne = 0;
-        int numberInTwo = 0;
-        String intendedColor = "";
-        double colorSum = colors.red + colors.green + colors.blue;
-        double colorSum2 = colors2.red + colors2.green + colors2.blue;
-        boolean isPixelIn1 = false;
-        boolean isPixelIn2 = false;
-        double redPercentage = (100 * colors.red) / colorSum;
-        double greenPercentage = (100 * colors.green) / colorSum;
-        double bluePercentage = (100 * colors.blue) / colorSum;
-        double redPercentage2 = (100 * colors2.red) / colorSum2;
-        double greenPercentage2 = (100 * colors2.green) / colorSum2;
-        double bluePercentage2 = (100 * colors2.blue) / colorSum2;
-        if (((DistanceSensor) robot.color1).getDistance(DistanceUnit.INCH) < 0.7) {
-            isPixelIn1 = true;
-        }
-        if (
-                (isPixelIn1) &&
-                        (greenPercentage > ColorSensorConstants.WHITE_G - 3) && (greenPercentage < ColorSensorConstants.WHITE_G + 3) &&
-                        (redPercentage > ColorSensorConstants.WHITE_R - 3) && (redPercentage < ColorSensorConstants.WHITE_R + 3) &&
-                        (bluePercentage > ColorSensorConstants.WHITE_B - 3) && (bluePercentage > ColorSensorConstants.WHITE_B + 3)) {
-            colorIn1 = "white!";
-        }
-        if (
-                (isPixelIn1) &&
-                        (greenPercentage > ColorSensorConstants.YELLOW_G - 3) && (greenPercentage < ColorSensorConstants.YELLOW_G + 3) &&
-                        (redPercentage > ColorSensorConstants.YELLOW_R - 3) && (redPercentage < ColorSensorConstants.YELLOW_R + 3) &&
-                        (bluePercentage > ColorSensorConstants.YELLOW_B - 3) && (bluePercentage > ColorSensorConstants.YELLOW_B + 3)) {
-            colorIn1 = "yellow!";
-        }
-        if (
-                (isPixelIn1) &&
-                        (greenPercentage > ColorSensorConstants.PURPLE_G - 3) && (greenPercentage < ColorSensorConstants.PURPLE_G + 3) &&
-                        (redPercentage > ColorSensorConstants.PURPLE_R - 3) && (redPercentage < ColorSensorConstants.PURPLE_R + 3) &&
-                        (bluePercentage > ColorSensorConstants.PURPLE_B - 3) && (bluePercentage > ColorSensorConstants.PURPLE_B + 3)) {
-            colorIn1 = "purple!";
-        }
-        if (
-                (isPixelIn1) &&
-                        (greenPercentage > ColorSensorConstants.GREEN_G - 3) && (greenPercentage < ColorSensorConstants.GREEN_G + 3) &&
-                        (redPercentage > ColorSensorConstants.GREEN_R - 3) && (redPercentage < ColorSensorConstants.GREEN_R + 3) &&
-                        (bluePercentage > ColorSensorConstants.GREEN_B - 3) && (bluePercentage > ColorSensorConstants.GREEN_B + 3)) {
-            colorIn1 = "green!";
-        }
+        
+        if (gamepad.right_stick_x >= 0.5) {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+        } else if (gamepad.right_stick_x <= -0.5) {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+        } else if (gamepad.right_stick_y >= 0.5) {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+        } else if (gamepad.right_stick_y <= -0.5) {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
+        } else if (intaking) {
 
-        //Color sensor 2
-        if (
-                (isPixelIn2) &&
-                        (greenPercentage2 > ColorSensorConstants.WHITE_G - 3) && (greenPercentage2 < ColorSensorConstants.WHITE_G + 3) &&
-                        (redPercentage2 > ColorSensorConstants.WHITE_R - 3) && (redPercentage2 < ColorSensorConstants.WHITE_R + 3) &&
-                        (bluePercentage2 > ColorSensorConstants.WHITE_B - 3) && (bluePercentage2 > ColorSensorConstants.WHITE_B + 3)) {
-            colorIn2 = "white!";
-        }
-        if (
-                (isPixelIn2) &&
-                        (greenPercentage2 > ColorSensorConstants.YELLOW_G - 3) && (greenPercentage2 < ColorSensorConstants.YELLOW_G + 3) &&
-                        (redPercentage2 > ColorSensorConstants.YELLOW_R - 3) && (redPercentage2 < ColorSensorConstants.YELLOW_R + 3) &&
-                        (bluePercentage2 > ColorSensorConstants.YELLOW_B - 3) && (bluePercentage2 > ColorSensorConstants.YELLOW_B + 3)) {
-            colorIn2 = "yellow!";
-        }
-        if (
-                (isPixelIn2) &&
-                        (greenPercentage2 > ColorSensorConstants.PURPLE_G - 3) && (greenPercentage2 < ColorSensorConstants.PURPLE_G + 3) &&
-                        (redPercentage2 > ColorSensorConstants.PURPLE_R - 3) && (redPercentage2 < ColorSensorConstants.PURPLE_R + 3) &&
-                        (bluePercentage2 > ColorSensorConstants.PURPLE_B - 3) && (bluePercentage2 > ColorSensorConstants.PURPLE_B + 3)) {
-            colorIn2 = "purple!";
-        }
-        if (
-                (isPixelIn2) &&
-                        (greenPercentage2 > ColorSensorConstants.GREEN_G - 3) && (greenPercentage2 < ColorSensorConstants.GREEN_G + 3) &&
-                        (redPercentage2 > ColorSensorConstants.GREEN_R - 3) && (redPercentage2 < ColorSensorConstants.GREEN_R + 3) &&
-                        (bluePercentage2 > ColorSensorConstants.GREEN_B - 3) && (bluePercentage2 > ColorSensorConstants.GREEN_B + 3)) {
-            colorIn2 = "green!";
-        }
-
-
-        if (isPixelIn1 == true) {
-            numberInOne = 1;
+            if (colorSensorList.get(2) == "red") {
+                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_RED);
+            } else if (colorSensorList.get(2) == "yellow") {
+                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+            } else if (colorSensorList.get(2) == "green") {
+                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SKY_BLUE);
+            }
+        } else if (colorSensorList.get(0) == "white!") {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
+        } else if (colorSensorList.get(0) == "yellow!") {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
+        } else if (colorSensorList.get(0) == "purple!") {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+        } else if (colorSensorList.get(0) == "green!") {
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
         } else {
-            numberInOne = 0;
+            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_PARTY_PALETTE);
         }
-
-        if (isPixelIn2 == true) {
-            numberInTwo = 1;
-        } else {
-            numberInTwo = 0;
-        }
-        if (numberInTwo + numberInOne == 0) {
-            intendedColor = "red";
-        }
-        if (numberInTwo + numberInOne == 1) {
-            intendedColor = "yellow";
-        }
-        if (numberInTwo + numberInOne == 2) {
-            intendedColor = "green";
-        }
-
-
-        if (TELEMETRY == "COLOR_SENSORS") {
-            telemetry.addData("Pixel in Slot 1: ", isPixelIn1);
-            telemetry.addData("Pixel Color in Slot 1: ", colorIn1);
-            telemetry.addData("distance", ((DistanceSensor) robot.color1).getDistance(DistanceUnit.INCH));
-            telemetry.addLine()
-                    .addData("Red", "%.3f", redPercentage)
-                    .addData("Green", "%.3f", greenPercentage)
-                    .addData("Blue", "%.3f", bluePercentage);
-            //COlor senosr 2
-            telemetry.addData("Pixel in Slot 2: ", isPixelIn2);
-            telemetry.addData("Pixel Color in Slot 2: ", colorIn2);
-            telemetry.addData("distance", ((DistanceSensor) robot.color2).getDistance(DistanceUnit.INCH));
-            telemetry.addLine()
-                    .addData("Red", "%.3f", redPercentage2)
-                    .addData("Green", "%.3f", greenPercentage2)
-                    .addData("Blue", "%.3f", bluePercentage2);
-            telemetry.update();
-        }
-        List<String> returner = new ArrayList<>();
-        returner.add(colorIn1);
-        returner.add(colorIn2);
-        returner.add(intendedColor);
-        return returner;
     }
 }
