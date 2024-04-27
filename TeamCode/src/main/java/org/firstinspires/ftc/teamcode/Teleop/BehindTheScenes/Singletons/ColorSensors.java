@@ -1,22 +1,17 @@
-package org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes;
-
+package org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons;
 
 
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Robot;
-
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Constants.ColorSensorConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ColorSensors {
 
-    Robot robot;
 
     private static final ColorSensors instance = new ColorSensors();
 
@@ -141,16 +136,18 @@ public class ColorSensors {
         returner.add( "Pixel in Slot 1: "+ isPixelIn1);
         returner.add("Pixel Color in Slot 1: "+ colorIn1);
         returner.add("distance: "+ ((DistanceSensor) robot.color1).getDistance(DistanceUnit.INCH));
-        returner.add("R "+((Math.round(redPercentage*1000))/1000));
-        returner.add("G "+(Math.round(greenPercentage*10000))/10000);
-        returner.add("B "+(Math.round(bluePercentage*10000))/10000);
+        returner.add("R "+((double) (Math.round(redPercentage*100))/100));
+        returner.add("G "+((double) (Math.round(greenPercentage*100))/100));
+        returner.add("B "+((double) (Math.round(bluePercentage*100))/100));
         //COlor senosr 2
         returner.add("Pixel in Slot 2: "+ isPixelIn2);
         returner.add("Pixel Color in Slot 2: "+ colorIn2);
         returner.add("distance: "+ ((DistanceSensor) robot.color2).getDistance(DistanceUnit.INCH));
-        returner.add("R "+(Math.round(redPercentage2*100))/100);
-        returner.add("G "+(Math.round(greenPercentage2*100))/100);
-        returner.add("B "+(Math.round(bluePercentage2*100))/100);
+        returner.add("R "+((double) (Math.round(redPercentage2*100))/100));
+        returner.add("G "+((double) (Math.round(greenPercentage2*100))/100));
+        returner.add("B "+((double) (Math.round(bluePercentage2*100))/100));
+        returner.add(String.valueOf(isPixelIn1));
+        returner.add(String.valueOf(isPixelIn2));
         return returner;
     }
 }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes;
+package org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Constants;
 
 import com.acmerobotics.dashboard.config.Config;
 

@@ -6,41 +6,38 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.ColorSensorConstants;
-import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.ColorSensors;
-import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Robot;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.ColorSensors;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.GamepadJoystickCurve;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Intaking;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Lights;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.PixelDoubleDrop;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.PixelSingleDrop;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Robot;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 @Config
 @TeleOp
 public class Drive extends LinearOpMode {
 
-    public static String CURVE = "LINEAR";
-    public static double DEGREE = 1;
+    public static String CURVE = "POWER";
+    public static double DEGREE = 2;
     public static int TELEMETRY = 0;
+    public static int LINEARSLIDE_LOCK_POS =100;
     private static MultipleTelemetry tele;
 
 
-    double g2XTimestamp = 0;
+    double singleDropTimestamp = 0;
+    boolean singleDrop = false;
+    double doubleDropTimestamp = 0;
+    boolean doubleDrop = false;
+    boolean linearSlideMode = false;
+    boolean intakeLights = false;
+    double intakeTimestamp = -90.0;
 
     Robot robot;
-
-
-
-
-
-
 
 
 
@@ -61,6 +58,10 @@ public class Drive extends LinearOpMode {
             g2, GamepadKeys.Button.X
         );
 
+        ButtonReader g2Y = new ButtonReader(
+                g2, GamepadKeys.Button.Y
+        );
+
 
 
 
@@ -69,13 +70,20 @@ public class Drive extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            //Teleop Code Goes Here
+
+            //Drivetrain:
+
+            double turbo = 0.8 + 0.2 * GamepadJoystickCurve.JoystickCurve(gamepad1.right_trigger, "POWER", 2.0)
+                    - 0.6 * GamepadJoystickCurve.JoystickCurve(gamepad1.left_trigger, "POWER", 2.0);
 
 
+            double rx = GamepadJoystickCurve.JoystickCurve(gamepad1.left_stick_x,CURVE, DEGREE);
+            double x = GamepadJoystickCurve.JoystickCurve(gamepad1.right_stick_x,CURVE, DEGREE);
+            double y = GamepadJoystickCurve.JoystickCurve(-gamepad1.right_stick_y,CURVE, DEGREE);
 
-            double rx = JoystickCurve(gamepad1.left_stick_x);
-            double x = JoystickCurve(gamepad1.right_stick_x);
-            double y = JoystickCurve(-gamepad1.right_stick_y);
+            rx*=turbo;
+            x*=turbo;
+            y*=turbo;
 
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
             double frontLeftPower = (y + x + rx) / denominator;
@@ -83,6 +91,99 @@ public class Drive extends LinearOpMode {
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
 
+            robot.frontLeftMotor.setPower(frontLeftPower);
+            robot.backLeftMotor.setPower(backLeftPower);
+            robot.frontRightMotor.setPower(frontRightPower);
+            robot.backRightMotor.setPower(backRightPower);
+
+
+            //Linear Slides:
+
+            if (robot.linearSlideLeft.getCurrentPosition()>LINEARSLIDE_LOCK_POS) {
+                linearSlideMode = true;
+            } else {
+                linearSlideMode = false;
+            }
+
+            if (gamepad2.right_trigger != 0) {
+                robot.linearSlideLeft.setPower(gamepad2.right_trigger);
+                robot.linearSlideRight.setPower(gamepad2.right_trigger);
+            } else if (gamepad2.left_trigger != 0) {
+                robot.linearSlideLeft.setPower(-gamepad2.left_trigger);
+                robot.linearSlideRight.setPower(-gamepad2.left_trigger);
+            } else if (linearSlideMode) {
+                robot.linearSlideLeft.setPower(0.1);
+                robot.linearSlideRight.setPower(0.1);
+            } else {
+                robot.linearSlideLeft.setPower(0);
+                robot.linearSlideRight.setPower(0);
+            }
+
+            //Single Drop
+
+            if (g2X.wasJustPressed()){
+              singleDropTimestamp = getRuntime();
+              singleDrop = true;
+            }
+            g2X.readValue();
+
+            if (singleDrop){
+                singleDrop = PixelSingleDrop.getInstance().drop(robot,singleDropTimestamp,getRuntime(),gamepad2.y);
+            }
+
+            //Double Drop
+
+            if (g2Y.wasJustPressed()){
+                doubleDropTimestamp = getRuntime();
+                doubleDrop = true;
+            }
+            g2Y.readValue();
+
+            if (doubleDrop){
+                doubleDrop = PixelDoubleDrop.getInstance().drop(robot,doubleDropTimestamp,getRuntime(),gamepad2.x);
+            }
+
+
+            //Color Sensors
+
+            List<String> colorOutput = ColorSensors.getInstance().colors(robot);
+
+            //Intaking
+
+
+            if (gamepad2.a){
+                Intaking.getInstance().intake(robot,colorOutput.get(15),colorOutput.get(16),false);
+                intakeTimestamp = getRuntime();
+            } else if (gamepad2.b){
+                Intaking.getInstance().intake(robot,colorOutput.get(15),colorOutput.get(16),true);
+                intakeTimestamp = getRuntime();
+            }
+
+            if (getRuntime()-intakeTimestamp<=0.5){
+                intakeLights = true;
+            } else {
+                intakeLights = false;
+            }
+
+            //Lights
+
+            Lights.getInstance().lightsFunction(robot, gamepad2, intakeLights, colorOutput);
+
+            //Telemetry
+
+            if (TELEMETRY==2){
+                tele.addLine(colorOutput.get(3));
+                tele.addLine(colorOutput.get(4));
+                tele.addLine(colorOutput.get(5));
+                tele.addLine(colorOutput.get(6)+", "+colorOutput.get(7)+ ", " + colorOutput.get(8));
+                tele.addLine();
+                tele.addLine(colorOutput.get(9));
+                tele.addLine(colorOutput.get(10));
+                tele.addLine(colorOutput.get(11));
+                tele.addLine(colorOutput.get(12)+", "+colorOutput.get(13)+ ", " + colorOutput.get(14 ));
+
+                tele.update();
+            }
 
             if (TELEMETRY==1) {
                 tele.addLine("FrontLeftPower: " + frontLeftPower);
@@ -100,126 +201,10 @@ public class Drive extends LinearOpMode {
             }
 
 
-
-
-
-
-            robot.frontLeftMotor.setPower(frontLeftPower);
-            robot.backLeftMotor.setPower(backLeftPower);
-            robot.frontRightMotor.setPower(frontRightPower);
-            robot.backRightMotor.setPower(backRightPower);
-
-
-            if (g2X.wasJustPressed()){
-              g2XTimestamp = getRuntime();
-            }
-            g2X.readValue();
-          
-            double g2XReleaseTime = getRuntime() - g2XTimestamp;
- 
-            if (getRuntime()>=1&&g2XTimestamp>=0){
-              if (g2XReleaseTime<0.2){
-                robot.pixelOut.setPosition(0);
-              } else if (g2XReleaseTime < 0.4) {
-                robot.pixelOut.setPosition(0.8);
-              } else if (g2XReleaseTime < 0.7) {
-                robot.pixelIn.setPower(0.77);
-              } else {
-                robot.pixelIn.setPower(0);
-                if (gamepad2.y){
-                  robot.pixelOut.setPosition(0);
-                }
-                g2XTimestamp = -800000;
-              }
-            }
-            List<String> colorOutput = ColorSensors.getInstance().colors(robot);
-            lightsFunction(gamepad2,gamepad2.a, colorOutput);
-
-            if (TELEMETRY==2){
-                tele.addLine(colorOutput.get(3));
-                tele.addLine(colorOutput.get(4));
-                tele.addLine(colorOutput.get(5));
-                tele.addLine(colorOutput.get(6)+", "+colorOutput.get(7)+ ", " + colorOutput.get(8));
-                tele.addLine();
-                tele.addLine(colorOutput.get(9));
-                tele.addLine(colorOutput.get(10));
-                tele.addLine(colorOutput.get(11));
-                tele.addLine(colorOutput.get(12)+", "+colorOutput.get(13)+ ", " + colorOutput.get(14 ));
-
-                tele.update();
-            }
-
-          
-
-            
-
-         
-            
-
-
         }
     }
-    public static double JoystickCurve (double input) {
-        if (Objects.equals(CURVE, "LINEAR")){
-            return input*DEGREE;
-        } else if (Objects.equals(CURVE,"POWER")){
-            double returner = Math.pow(input, DEGREE);
-            if (input<0&&returner>0){
-                returner*=-1;
-            }
-            return returner;
-        } else if (Objects.equals(CURVE,"WIDE")){
-            if (Math.abs(input)<0.5){
-              double returner = Math.pow((2*input), DEGREE);
-              returner = returner/2;
-              if (input<0&&returner>0){
-                returner *= -1;
-              }
-              return returner;
-            } else {
-              double returner = Math.pow(((2*Math.abs(input))-1),(1/DEGREE));
-              returner = returner/2;
-              returner +=0.5;
-              if (input<0&&returner>0){
-                returner*=-1;
-              }
-              return returner;
-            }
-        }
-        return input;
-    }
+
     
 
-    public void lightsFunction (Gamepad gamepad, boolean intaking, List<String> colorSensorList){
-        robot = new Robot(hardwareMap);
-        
-        if (gamepad.right_stick_x >= 0.5) {
-            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-        } else if (gamepad.right_stick_x <= -0.5) {
-            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-        } else if (gamepad.right_stick_y >= 0.5) {
-            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-        } else if (gamepad.right_stick_y <= -0.5) {
-            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
-        } else if (intaking) {
 
-            if (colorSensorList.get(2) == "red") {
-                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_RED);
-            } else if (colorSensorList.get(2) == "yellow") {
-                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-            } else if (colorSensorList.get(2) == "green") {
-                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SKY_BLUE);
-            }
-        } else if (colorSensorList.get(0) == "white!") {
-            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
-        } else if (colorSensorList.get(0) == "yellow!") {
-            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
-        } else if (colorSensorList.get(0) == "purple!") {
-            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-        } else if (colorSensorList.get(0) == "green!") {
-            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-        } else {
-            robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_PARTY_PALETTE);
-        }
-    }
 }
