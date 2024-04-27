@@ -36,6 +36,7 @@ public class Drive extends LinearOpMode {
     boolean linearSlideMode = false;
     boolean intakeLights = false;
     double intakeTimestamp = -90.0;
+    public static double POSITION = 0.5;
 
     Robot robot;
 
@@ -61,6 +62,7 @@ public class Drive extends LinearOpMode {
         ButtonReader g2Y = new ButtonReader(
                 g2, GamepadKeys.Button.Y
         );
+
 
 
 
@@ -119,6 +121,10 @@ public class Drive extends LinearOpMode {
                 robot.linearSlideRight.setPower(0);
             }
 
+            if (gamepad2.dpad_down){
+                robot.stack.setPosition(POSITION);
+            }
+
             //Single Drop
 
             if (g2X.wasJustPressed()){
@@ -127,8 +133,21 @@ public class Drive extends LinearOpMode {
             }
             g2X.readValue();
 
-            if (singleDrop){
-                singleDrop = PixelSingleDrop.getInstance().drop(robot,singleDropTimestamp,getRuntime(),gamepad2.y);
+            if (singleDrop) {
+                double sDTime = getRuntime() - singleDropTimestamp;
+                if (sDTime < 0.2) {
+                    robot.pixelOut.setPosition(0);
+                } else if (sDTime < 0.4) {
+                    robot.pixelOut.setPosition(0.8);
+                } else if (sDTime < 0.7) {
+                    robot.pixelIn.setPower(0.77);
+                } else {
+                    robot.pixelIn.setPower(0);
+                    if (gamepad2.y){
+                        robot.pixelOut.setPosition(0);
+                    }
+                    singleDrop = false;
+                }
             }
 
             //Double Drop
@@ -157,6 +176,11 @@ public class Drive extends LinearOpMode {
             } else if (gamepad2.b){
                 Intaking.getInstance().intake(robot,colorOutput.get(15),colorOutput.get(16),true);
                 intakeTimestamp = getRuntime();
+            } else {
+                if (!(gamepad2.x&&gamepad2.y)){
+                    robot.pixelIn.setPower(0);
+                }
+                robot.intakeMotor.setPower(0);
             }
 
             if (getRuntime()-intakeTimestamp<=0.5){
@@ -197,6 +221,10 @@ public class Drive extends LinearOpMode {
                 tele.addLine("Use FTC Dash to select telmetry");
                 tele.addLine("1 = Motor Power");
                 tele.addLine("2 = Color Sensors");
+                tele.update();
+            }
+            if(TELEMETRY==3){
+                tele.addLine(String.valueOf(robot.stack.getPosition()));
                 tele.update();
             }
 

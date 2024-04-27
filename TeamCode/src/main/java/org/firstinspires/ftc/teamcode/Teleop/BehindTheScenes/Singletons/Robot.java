@@ -22,6 +22,7 @@ public class Robot {
     public CRServo mosaicMover;
     public CRServo pixelIn;
     public Servo pixelOut;
+    public Servo stack;
     public CRServo droneLauncher;
     public CRServo intakeRotate;
     public CRServo intakeMove;
@@ -62,6 +63,7 @@ public class Robot {
         dist2 = hardwareMap.get(DistanceSensor.class, "dist2");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
         stackKnocker = hardwareMap.crservo.get("stackKnocker");
+        stack = hardwareMap.servo.get("Stack");
 
         linearSlideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         linearSlideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

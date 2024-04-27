@@ -43,6 +43,9 @@ public class ColorSensors {
         if (((DistanceSensor) robot.color1).getDistance(DistanceUnit.INCH) < 0.7) {
             isPixelIn1 = true;
         }
+        if (((DistanceSensor) robot.color2).getDistance(DistanceUnit.INCH) < 1) {
+            isPixelIn2 = true;
+        }
         if (
                 (isPixelIn1) &&
                         (greenPercentage > (ColorSensorConstants.WHITE_G - 3)) && (greenPercentage < ColorSensorConstants.WHITE_G + 3) &&

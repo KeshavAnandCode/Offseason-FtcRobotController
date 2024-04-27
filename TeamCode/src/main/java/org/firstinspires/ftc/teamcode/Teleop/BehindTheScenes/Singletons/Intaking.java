@@ -21,10 +21,11 @@ public class Intaking {
                 robot.intakeMotor.setPower(0.9);
             }
         } else {
+            robot.pixelOut.setPosition(.8);
             robot.intakeMotor.setPower(-0.8);
             robot.pixelIn.setPower(1);
-            robot.intakeRotate.setPower(-.5);
-            robot.intakeMove.setPower(-.4);
+            robot.intakeRotate.setPower(0.1);
+            robot.intakeMove.setPower(0);
         }
 
 
