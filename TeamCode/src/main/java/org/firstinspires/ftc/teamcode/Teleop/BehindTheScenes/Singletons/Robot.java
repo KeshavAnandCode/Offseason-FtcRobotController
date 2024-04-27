@@ -35,7 +35,7 @@ public class Robot {
     public DcMotorEx linearSlideLeft;
     public DcMotorEx linearSlideRight;
     public DcMotorEx intakeMotor;
-    public DcMotorEx lineearActuator;
+    public DcMotorEx linearActuator;
 
 
     public Telemetry telemetry;
@@ -58,7 +58,7 @@ public class Robot {
         color2 = hardwareMap.get(NormalizedColorSensor.class, "color2");
         intakeMove = hardwareMap.crservo.get("intakeMove");
         intakeRotate = hardwareMap.crservo.get("intakeRotate");
-        lineearActuator = hardwareMap.get(DcMotorEx.class,"linearActuator");
+        linearActuator = hardwareMap.get(DcMotorEx.class,"linearActuator");
         dist = hardwareMap.get(DistanceSensor.class, "dist");
         dist2 = hardwareMap.get(DistanceSensor.class, "dist2");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
@@ -67,7 +67,8 @@ public class Robot {
 
         linearSlideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         linearSlideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intakeMove.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeMove.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeRotate.setDirection(DcMotorSimple.Direction.REVERSE);
         pixelIn.setDirection(DcMotorSimple.Direction.REVERSE);
         linearSlideLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         linearSlideRight.setDirection(DcMotorSimple.Direction.FORWARD);

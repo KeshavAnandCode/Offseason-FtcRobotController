@@ -6,15 +6,15 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.arcrobotics.ftclib.gamepad.ToggleButtonReader;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.ColorSensors;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.GamepadJoystickCurve;
+import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Hang;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Intaking;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Lights;
-import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.PixelDoubleDrop;
-import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.PixelSingleDrop;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Robot;
 
 import java.util.List;
@@ -36,7 +36,9 @@ public class Drive extends LinearOpMode {
     boolean linearSlideMode = false;
     boolean intakeLights = false;
     double intakeTimestamp = -90.0;
-    public static double POSITION = 0.5;
+    boolean hang = false;
+    double hangTimestamp = 0.0;
+    double oldMosaicTimestamp = 0.0;
 
     Robot robot;
 
@@ -62,6 +64,22 @@ public class Drive extends LinearOpMode {
         ButtonReader g2Y = new ButtonReader(
                 g2, GamepadKeys.Button.Y
         );
+
+        ButtonReader g1Back = new ButtonReader(
+                g1, GamepadKeys.Button.BACK
+        );
+
+        ToggleButtonReader drone = new ToggleButtonReader(
+                g1, GamepadKeys.Button.START
+        );
+
+        ToggleButtonReader oldMosaic = new ToggleButtonReader(
+                g2, GamepadKeys.Button.START
+        );
+        ToggleButtonReader mosaic = new ToggleButtonReader(
+                g2, GamepadKeys.Button.BACK
+        );
+
 
 
 
@@ -121,10 +139,7 @@ public class Drive extends LinearOpMode {
                 robot.linearSlideRight.setPower(0);
             }
 
-            if (gamepad2.dpad_down){
-                robot.stack.setPosition(POSITION);
-            }
-
+        
             //Single Drop
 
             if (g2X.wasJustPressed()){
@@ -158,9 +173,22 @@ public class Drive extends LinearOpMode {
             }
             g2Y.readValue();
 
-            if (doubleDrop){
-                doubleDrop = PixelDoubleDrop.getInstance().drop(robot,doubleDropTimestamp,getRuntime(),gamepad2.x);
+            if (doubleDrop) {
+                double sDTime = getRuntime() - doubleDropTimestamp;
+                if (sDTime < 0.5) {
+                    robot.pixelOut.setPosition(0);
+                } else if (sDTime < 1) {
+                    robot.pixelIn.setPower(0.77);
+                } else {
+                    robot.pixelIn.setPower(0);
+                    doubleDrop = false;
+                }
+                if (gamepad2.x){
+                    doubleDrop = false;
+                }
             }
+
+           
 
 
             //Color Sensors
@@ -192,6 +220,89 @@ public class Drive extends LinearOpMode {
             //Lights
 
             Lights.getInstance().lightsFunction(robot, gamepad2, intakeLights, colorOutput);
+            
+            //Hang
+
+            if (g1Back.wasJustPressed()){
+                hangTimestamp = getRuntime();
+                hang = true;
+            }
+            
+            if (hang){
+                hang = Hang.getInstance().hang(robot,hangTimestamp,getRuntime());
+            }
+            g1Back.readValue();
+
+            if (gamepad1.x) {
+                robot.linActServo.setPower(-1);
+            } else if (gamepad1.b){
+                robot.linActServo.setPower(1);
+            } else {
+                robot.linActServo.setPower(0);
+
+            }
+
+            if (gamepad1.y) {
+                robot.linearActuator.setPower(1);
+            } else if (gamepad1.a) {
+                robot.linearActuator.setPower(-1);
+            } else {
+                robot.linearActuator.setPower(0);
+            }
+            
+            //Drone:
+
+            if (drone.getState()) {
+                robot.droneLauncher.setPower(1);
+            } else {
+                robot.droneLauncher.setPower(-1);
+            }
+            drone.readValue();
+            
+            //Mosaic Mover
+
+            if(oldMosaic.getState()){
+                robot.mosaicMover.setPower(1);
+            } else {
+                if (oldMosaic.stateJustChanged()){
+                    oldMosaicTimestamp = getRuntime();
+                }
+                if ((getRuntime()-oldMosaicTimestamp)<1.5){
+                    robot.mosaicMover.setPower(-1);
+                } else {
+                    robot.mosaicMover.setPower(0);
+                }
+            }
+            oldMosaic.readValue();
+
+            
+            if(mosaic.getState()){
+                robot.pixelOut.setPosition(0.27);
+            } 
+            mosaic.readValue();
+            
+            //Arm
+
+            if (-gamepad2.left_stick_y>0) {
+                robot.intakeRotate.setPower(0.1);
+                robot.intakeMove.setPower(gamepad2.left_stick_y*0.5);
+            } else if (-gamepad2.left_stick_y<0) {
+                robot.intakeRotate.setPower(-0.1);
+                robot.intakeMove.setPower(gamepad2.left_stick_y*0.5);
+            } else if (gamepad2.dpad_up) {
+                robot.intakeRotate.setPower(0.6);
+                robot.intakeMove.setPower(0.13);
+            } else if (gamepad2.dpad_down) {
+                robot.intakeRotate.setPower(-0.6);
+                robot.intakeMove.setPower(0.1);
+            } else {
+                robot.intakeRotate.setPower(0);
+                robot.intakeMove.setPower(0);
+            }
+
+
+
+
 
             //Telemetry
 

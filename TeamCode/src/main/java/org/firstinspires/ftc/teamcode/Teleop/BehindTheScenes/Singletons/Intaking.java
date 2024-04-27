@@ -13,7 +13,7 @@ public class Intaking {
         if(!reverse) {
             robot.pixelIn.setPower(1);
             robot.pixelOut.setPosition(.8);
-            robot.intakeRotate.setPower(0.1);
+            robot.intakeRotate.setPower(-0.1);
             robot.intakeMove.setPower(0);
             if(pixelIn1=="true"&&pixelIn2=="true"){
                 robot.intakeMotor.setPower(-0.42);
@@ -24,7 +24,7 @@ public class Intaking {
             robot.pixelOut.setPosition(.8);
             robot.intakeMotor.setPower(-0.8);
             robot.pixelIn.setPower(1);
-            robot.intakeRotate.setPower(0.1);
+            robot.intakeRotate.setPower(-0.1);
             robot.intakeMove.setPower(0);
         }
 
