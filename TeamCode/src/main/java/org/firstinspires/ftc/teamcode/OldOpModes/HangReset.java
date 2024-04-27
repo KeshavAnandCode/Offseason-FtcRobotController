@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class HangReset extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
+
         // Declare our motors
         // Make sure your ID's match your configuration
         CRServo linActServo = hardwareMap.crservo.get("linActServo");
