@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons;
 
+import com.acmerobotics.dashboard.config.Config;
+
+@Config
 public class Hang {
 
     private static final Hang instance = new Hang();
