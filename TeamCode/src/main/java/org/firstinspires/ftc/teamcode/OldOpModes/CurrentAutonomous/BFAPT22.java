@@ -937,6 +937,7 @@ public class BFAPT22 extends LinearOpMode {
                 drive.followTrajectorySequence(getPixel);
             }
 
+
             checkForColor();
             lights.setPattern(help);
             resetRuntime();
