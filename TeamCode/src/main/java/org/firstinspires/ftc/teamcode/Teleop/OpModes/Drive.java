@@ -28,8 +28,8 @@ import java.util.List;
 @TeleOp
 public class Drive extends LinearOpMode {
 
-    public static String CURVE = "POWER";
-    public static double DEGREE = 2;
+    public static String CURVE = "LINEAR";
+    public static double DEGREE = 1;
     public static int TELEMETRY = 0;
     public static int LINEARSLIDE_LOCK_POS =100;
     private static MultipleTelemetry tele;
@@ -300,10 +300,9 @@ public class Drive extends LinearOpMode {
             }
             oldMosaic.readValue();
 
-            
-            if(gamepad2.back){
-                robot.pixelOut.setPosition(0.23);
-            } 
+//            if(gamepad2.back){
+//                robot.pixelOut.setPosition(0.23);
+//            }
 
             
             //Arm
