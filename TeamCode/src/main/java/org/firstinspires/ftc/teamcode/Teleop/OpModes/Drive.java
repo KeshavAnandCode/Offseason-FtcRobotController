@@ -333,14 +333,12 @@ public class Drive extends LinearOpMode {
             }
 
             if (g2RB.wasJustPressed()){
-              if (robot.stack.getPosition()==0.8){
                     robot.stack.setPosition(0.24);
-                } else{robot.stack.setPosition(robot.stack.getPosition()+0.04);}
             }
 
             if (g2LB.wasJustPressed()){
                 if (robot.stack.getPosition()==0.8) {
-                    robot.stack.setPosition(0.08);
+                    robot.stack.setPosition(0.24);
                 }  else {
                     robot.stack.setPosition(robot.stack.getPosition()-0.03);
                 }
