@@ -63,12 +63,12 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-@Autonomous(name = "RBAPT23_Edge_Stack")
+@Autonomous(name = "RBAPT_NT")
 
-public class RBAPT23_Edge_Stack extends LinearOpMode {
+public class RBAPT_NT extends LinearOpMode {
 
 
-    int auto =3;
+    int auto =1;
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
     /**
@@ -85,14 +85,15 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
      * The variable to store our instance of the vision portal.
      */
     private VisionPortal myVisionPortal;
-    private static String TFOD_MODEL_ASSET = "Meet1Red.tflite";
+    private static final String TFOD_MODEL_ASSET = "Meet1Blue.tflite";
     // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
     // this is used when uploading models directly to the RC using the model upload interface.
-    private static String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/myCustomModel.tflite";
+    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/myCustomModel.tflite";
     // Define the labels recognized in the model for TFOD (must be in training order!)
-    private static  String[] LABELS = {
-       "red",
+    private static final String[] LABELS = {
+       "blue",
     };
+
     private static NormalizedColorSensor color1;
     private static NormalizedColorSensor color2;
     int numberInOne;
@@ -113,9 +114,10 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
     @Override
     public void runOpMode() {
         initDoubleVision();
+        Servo stack = hardwareMap.servo.get("Stack");
+        RevBlinkinLedDriver lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
         color1 = hardwareMap.get(NormalizedColorSensor.class, "color");
         color2 = hardwareMap.get(NormalizedColorSensor.class, "color2");
-        RevBlinkinLedDriver lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
         CRServo intakeMove = hardwareMap.crservo.get("intakeMove");
         CRServo intakeRotate = hardwareMap.crservo.get("intakeRotate");
         Servo pixelOut = hardwareMap.servo.get("pixelOut");
@@ -126,8 +128,6 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
         CRServo stackKnocker = hardwareMap.crservo.get("stackKnocker");
-        DistanceSensor dist = hardwareMap.get(DistanceSensor.class, "dist");
-        DistanceSensor dist2 = hardwareMap.get(DistanceSensor.class, "dist2");
         DcMotor linearSlideLeft = hardwareMap.dcMotor.get("linearSlideLeft");
         DcMotor linearSlideRight = hardwareMap.dcMotor.get("linearSlideRight");
         linearSlideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -145,6 +145,7 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
         frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+
         double xforlast = 0;
         double yforlast = 0;
         int idforapril = 0;
@@ -155,183 +156,160 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
 
         Pose2d startPose =new Pose2d(0, 0, Math.toRadians(0));
 
-        drive.setPoseEstimate(startPose);
         TrajectorySequence trajSeq1 =drive.trajectorySequenceBuilder(startPose)
+                .back(6)
                 .lineToSplineHeading(new Pose2d(-30,-12, Math.toRadians(-90)))
-                .lineToConstantHeading(new Vector2d(-25.5,-16.5))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(1))
-                .waitSeconds(1)
-                .lineToConstantHeading(new Vector2d(-25.5,-20))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stack.setPosition(0.23))//0.24
+                .lineToConstantHeading(new Vector2d(-24.5,-16.5)) // x 25.5
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0.1))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(-1))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(0.5))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(0))
-                .waitSeconds(1)
-                .lineToConstantHeading(new Vector2d(-25.5,-16))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-0.3))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
                 .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-0.6))
-                .waitSeconds(0.5)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stack.setPosition(0.8))
+                .forward(2.5)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0.1))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(-1))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(0.5))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(0))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
+                .back(3.5)
+                .waitSeconds(0.1)
+                .UNSTABLE_addTemporalMarkerOffset(-0.08, () -> intakeMotor.setPower(-0.5))
+                .waitSeconds(0.1)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-0.7))
+                .waitSeconds(0.1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-1))
-                .lineToSplineHeading(new Pose2d(-3.5,-14.5, Math.toRadians(-90)))
+                .waitSeconds(0.1)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(0))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stack.setPosition(0.7))
+                .lineToConstantHeading(new Vector2d(-48.5,3))// x-50.5 y 2
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(0))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> checkForColor())
                 .UNSTABLE_addTemporalMarkerOffset(0, () ->  lights.setPattern(help))
-                .lineToConstantHeading(new Vector2d(-3.5,78.5))
+                .back(80)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(-0.5))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(-0.1))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> linearSlideLeft.setPower(0.4))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> linearSlideRight.setPower(0.4))
                 .UNSTABLE_addTemporalMarkerOffset(0.1, () -> linearSlideLeft.setPower(0.1))
                 .UNSTABLE_addTemporalMarkerOffset(0.1, () -> linearSlideRight.setPower(0.1))
-                .lineToConstantHeading(new Vector2d(-30.5,78.5))
+                .lineToConstantHeading(new Vector2d(-18,82))
                 .build();
-        TrajectorySequence trajSeq2 =drive.trajectorySequenceBuilder(startPose)
-                .lineToSplineHeading(new Pose2d(-37.5,-5, Math.toRadians(-90)))
-                .lineToConstantHeading(new Vector2d(-25.5,-16.5))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(1))
-                .waitSeconds(1)
-                .lineToConstantHeading(new Vector2d(-25.5,-20))
+        TrajectorySequence trajSeq3 =drive.trajectorySequenceBuilder(startPose)
+                .back(6)
+                .lineToSplineHeading(new Pose2d(-28.5,11, Math.toRadians(90)))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stack.setPosition(0.23))//0.24
+                .lineToConstantHeading(new Vector2d(-25.5,14))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0.1))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(-1))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(0.5))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(0))
-                .waitSeconds(1)
-                .lineToConstantHeading(new Vector2d(-25.5,-16))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-0.3))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
                 .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-0.6))
-                .waitSeconds(0.5)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stack.setPosition(0.8))
+                .forward(2.5)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0.1))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(-1))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(0.5))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(0))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
+                .back(1.5)
+                .waitSeconds(0.1)
+                .UNSTABLE_addTemporalMarkerOffset(-0.08, () -> intakeMotor.setPower(-0.5))
+                .waitSeconds(0.1)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-0.7))
+                .waitSeconds(0.1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-1))
-                .lineToSplineHeading(new Pose2d(-3.5,-14.5, Math.toRadians(-90)))
+                .waitSeconds(0.1)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(0))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stack.setPosition(0.7))
+                .lineToConstantHeading(new Vector2d(-48.5,14))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(0))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> checkForColor())
                 .UNSTABLE_addTemporalMarkerOffset(0, () ->  lights.setPattern(help))
-                .lineToConstantHeading(new Vector2d(-3.5,78.5))
+                .back(93)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(-0.5))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(-0.1))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> linearSlideLeft.setPower(0.4))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> linearSlideRight.setPower(0.4))
                 .UNSTABLE_addTemporalMarkerOffset(0.1, () -> linearSlideLeft.setPower(0.1))
                 .UNSTABLE_addTemporalMarkerOffset(0.1, () -> linearSlideRight.setPower(0.1))
-                .lineToConstantHeading(new Vector2d(-24.5,78.5))
+                .lineToConstantHeading(new Vector2d(-30,-79))
                 .build();
 
-        TrajectorySequence trajSeq3 =drive.trajectorySequenceBuilder(startPose)
-                .lineToSplineHeading(new Pose2d(-28.5,10, Math.toRadians(-90)))
-                .lineToConstantHeading(new Vector2d(-25.5,-16.5))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(1))
-                .waitSeconds(1)
-                .lineToConstantHeading(new Vector2d(-25.5,-20))
+        TrajectorySequence trajSeq2 =drive.trajectorySequenceBuilder(startPose)
+                .lineToSplineHeading(new Pose2d(-37.5,0, Math.toRadians(90)))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stack.setPosition(0.23))
+                .lineToConstantHeading(new Vector2d(-37.5,14))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0.1))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(-1))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(0.5))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(0))
-                .waitSeconds(1)
-                .lineToConstantHeading(new Vector2d(-25.5,-16))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-0.3))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
                 .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-0.6))
-                .waitSeconds(0.5)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stack.setPosition(0.8))
+                .forward(2.5)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0.1))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(-1))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(0.5))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(0))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
+                .back(3.5)
+                .waitSeconds(0.1)
+                .UNSTABLE_addTemporalMarkerOffset(-0.08, () -> intakeMotor.setPower(-0.5))
+                .waitSeconds(0.1)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-0.7))
+                .waitSeconds(0.1)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(-1))
-                .lineToSplineHeading(new Pose2d(-3.5,-14.5, Math.toRadians(-90)))
+                .waitSeconds(0.1)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(0))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> stack.setPosition(0.7))
+                .lineToConstantHeading(new Vector2d(-40.5,-2)) //48.5
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(0))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> checkForColor())
                 .UNSTABLE_addTemporalMarkerOffset(0, () ->  lights.setPattern(help))
-                .lineToConstantHeading(new Vector2d(-3.5,78.5))
+                .back(77)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(-0.5))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(-0.1))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> linearSlideLeft.setPower(0.4))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> linearSlideRight.setPower(0.4))
                 .UNSTABLE_addTemporalMarkerOffset(0.1, () -> linearSlideLeft.setPower(0.1))
                 .UNSTABLE_addTemporalMarkerOffset(0.1, () -> linearSlideRight.setPower(0.1))
-                .lineToConstantHeading(new Vector2d(-18.5,78.5))
+                .lineToConstantHeading(new Vector2d(-24,-79))
                 .build();
-        TrajectorySequence trajSeq3back =drive.trajectorySequenceBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(-20,78.5))  //y:-32, -30 , -40 , 28
-                .build();
-             // //.UNSTABLE_addTemporalMarkerOffset(0.0, () -> intakeMove.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0.0, () -> intakeRotate.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0.0, () -> intakeMove.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0.0, () -> intakeRotate.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(1))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(1))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(0.5))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(0.5))
-             // .lineToConstantHeading(new Vector2d(110.5,-30)) //y:-32, -30 , -40 , 28 x:110 , 112
-             // .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> stackKnocker.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(-0.5))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(-0.5))
-             // .UNSTABLE_addTemporalMarkerOffset(0.1, () -> stackKnocker.setPower(-0.5))
-             // .waitSeconds(0.5)
-             // .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> stackKnocker.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0.1))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0.1))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(-0.5))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(-0.5))
-             // .UNSTABLE_addTemporalMarkerOffset(0.1, () -> stackKnocker.setPower(-0.5))
-             // .UNSTABLE_addTemporalMarkerOffset(0.1, () -> intakeMotor.setPower(0.9))
-             // .UNSTABLE_addTemporalMarkerOffset(0.4, () -> intakeMotor.setPower(0.9))
-             // .lineToConstantHeading(new Vector2d(114.6,-27)) //y:-32, -30 , -40 , 28
-             // .UNSTABLE_addTemporalMarkerOffset(-0.1, () -> intakeMotor.setPower(0.9))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0.1))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0.1))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(-1))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(0.5))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> stackKnocker.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMove.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeRotate.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(-1))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> pixelIn.setPower(-1))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> intakeMotor.setPower(0.9))
-             // .lineToConstantHeading(new Vector2d(96,-30))
-             // .UNSTABLE_addTemporalMarkerOffset(0, () -> checkForColor())
-             // .UNSTABLE_addTemporalMarkerOffset(0, () ->  lights.setPattern(help))
-             // .build();
+
         Trajectory traj1a = drive.trajectoryBuilder(new Pose2d())
-                .lineToConstantHeading(new Vector2d(-22,-6.6))
+                .lineToSplineHeading(new Pose2d(-28.5,-9,Math.toRadians(90)))
 
                 .build();
         Trajectory traj1b = drive.trajectoryBuilder(new Pose2d())
-                .lineToSplineHeading (new Pose2d(-1,0,Math.toRadians(-92)),
-                        SampleMecanumDrive.getVelocityConstraint(20,6.7464,10.69),
-                        SampleMecanumDrive.getAccelerationConstraint(50)
 
-                        )
+                .lineToConstantHeading (new Vector2d(9,0))
+
                 .build();
         Trajectory trajz = drive.trajectoryBuilder(new Pose2d())
-                .lineToConstantHeading (new Vector2d(0,2.5),
+                .lineToConstantHeading (new Vector2d(0,-3.2),
                         SampleMecanumDrive.getVelocityConstraint(13,2.5,10.69),
                         SampleMecanumDrive.getAccelerationConstraint(30)
                 )
                 .build();
-        Trajectory traj1c = drive.trajectoryBuilder(new Pose2d())
+        Trajectory traj1r = drive.trajectoryBuilder(new Pose2d())
 
-                .lineToConstantHeading(new Vector2d(-75,0))
-
-                .build();
-        Trajectory trajcc = drive.trajectoryBuilder(new Pose2d())
-
-                .lineToConstantHeading(new Vector2d(-78.5,0))
-
-                .build();
-        Trajectory traj3c = drive.trajectoryBuilder(new Pose2d())
-
-                .lineToConstantHeading(new Vector2d(-82,0))
+                .lineToSplineHeading(new Pose2d(0,-25.5,Math.toRadians(-90)))
 
                 .build();
         Trajectory traj1d = drive.trajectoryBuilder(new Pose2d())
@@ -339,22 +317,62 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
                 .lineToConstantHeading(new Vector2d(4,0))
                 .build();
 
+
+        Trajectory traj1c = drive.trajectoryBuilder(new Pose2d())
+
+                .lineToSplineHeading (new Pose2d(-1,0,Math.toRadians(92)),
+                        SampleMecanumDrive.getVelocityConstraint(20,6.7464,10.69),
+                        SampleMecanumDrive.getAccelerationConstraint(50)
+
+                )
+                .build();
+        Trajectory traj2c = drive.trajectoryBuilder(new Pose2d())
+
+                .lineToSplineHeading (new Pose2d(-1,0,Math.toRadians(86)))
+
+                .build();
+
+        Trajectory trajd = drive.trajectoryBuilder(new Pose2d())
+
+                .lineToConstantHeading(new Vector2d(-80,0))
+
+
+                .build();
         Trajectory traj1e = drive.trajectoryBuilder(new Pose2d())
 
-                .lineToConstantHeading (new Vector2d(0,-6))
+                .lineToSplineHeading (new Pose2d(11,0,Math.toRadians(1)))
 
                 .build();
         Trajectory traj1x = drive.trajectoryBuilder(new Pose2d())
 
-                .lineToSplineHeading(new Pose2d(0,-28,Math.toRadians(-5)))
+                .lineToSplineHeading(new Pose2d(0,15,Math.toRadians(1.3)))
                 .build();
         Trajectory traj2x = drive.trajectoryBuilder(new Pose2d())
 
-                .lineToSplineHeading(new Pose2d(0,-21,Math.toRadians(-5)))
+                .lineToSplineHeading(new Pose2d(0,22,Math.toRadians(1.6)))
                 .build();
         Trajectory traj3x = drive.trajectoryBuilder(new Pose2d())
 
-                .lineToSplineHeading(new Pose2d(0,-15,Math.toRadians(-5)))
+                .lineToSplineHeading(new Pose2d(0,28,Math.toRadians(2)))
+                .build();
+        Trajectory traj2a = drive.trajectoryBuilder(new Pose2d())
+
+                .lineToConstantHeading (new Vector2d(-31,-3))
+
+                .build();
+        Trajectory traj2b = drive.trajectoryBuilder(new Pose2d())
+
+                .lineToConstantHeading (new Vector2d(27.5,3))
+
+                .build();
+        Trajectory traj3a = drive.trajectoryBuilder(new Pose2d())
+
+                .lineToConstantHeading(new Vector2d(-27,5.6))
+
+                .build();
+        Trajectory traj3b = drive.trajectoryBuilder(new Pose2d())
+
+                .lineToConstantHeading (new Vector2d(23.5,-5.6))
 
                 .build();
         Trajectory traj3e = drive.trajectoryBuilder(new Pose2d())
@@ -362,14 +380,10 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
                 .lineToSplineHeading (new Pose2d(11,0,Math.toRadians(1)))
 
                 .build();
-        Trajectory trajd = drive.trajectoryBuilder(new Pose2d())
 
-                .lineToConstantHeading (new Vector2d(-1,0))
+                Trajectory traj1f = drive.trajectoryBuilder(new Pose2d())
 
-                .build();
-        Trajectory traj1f = drive.trajectoryBuilder(new Pose2d())
-
-                .lineToConstantHeading (new Vector2d(0,29.5))
+                .lineToConstantHeading (new Vector2d(0,-16.5))
 
                 .build();
         Trajectory traj2f = drive.trajectoryBuilder(new Pose2d())
@@ -392,25 +406,20 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
                 .lineToConstantHeading (new Vector2d(-15,0))
 
                 .build();
-        Trajectory traj2a = drive.trajectoryBuilder(new Pose2d())
-                .lineToConstantHeading(new Vector2d(-31,0))
-                .build();
         Trajectory traj2d = drive.trajectoryBuilder(new Pose2d())
-                .lineToConstantHeading(new Vector2d(27,0))
-                .build();
-        Trajectory traj3a = drive.trajectoryBuilder(new Pose2d())
-                .lineToSplineHeading(new Pose2d(-27,7.3,Math.toRadians(-90)))
+
+                .lineToConstantHeading (new Vector2d(-10,-11))
 
                 .build();
-        Trajectory traj3b = drive.trajectoryBuilder(new Pose2d())
-                .lineToConstantHeading(new Vector2d(7.3,0),
-                        SampleMecanumDrive.getVelocityConstraint(13,2.5,10.69),
-                        SampleMecanumDrive.getAccelerationConstraint(30)
-                )
+
+        Trajectory traj3c = drive.trajectoryBuilder(new Pose2d())
+
+                .lineToSplineHeading (new Pose2d(0,10,Math.toRadians(-90)))
 
                 .build();
-        Trajectory traj3r = drive.trajectoryBuilder(new Pose2d())
-                .lineToSplineHeading(new Pose2d(0,23.5,Math.toRadians(90)))
+        Trajectory traj3d = drive.trajectoryBuilder(new Pose2d())
+
+                .lineToConstantHeading (new Vector2d(-8,-7))
 
                 .build();
 
@@ -430,13 +439,12 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
 
         if (opModeIsActive()) {
             sleep(5000);
-            intakeMove.setPower(0);
-            if (auto == 2 || auto == 1) {
+            if (auto == 2 || auto == 3) {
                 telemetry.addData("auto", auto);
                 telemetry.update();
             } else {
                 resetRuntime();
-                while (getRuntime() < 1 && auto == 3) {
+                while (getRuntime() < 1 && auto == 1) {
                     telemetryTfod();
 
                     telemetry.update();
@@ -450,8 +458,10 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
 
 
         if (auto ==1){
+
             pixelOut.setPosition(0.8);
             drive.followTrajectorySequence(trajSeq1);
+
             drive.setPoseEstimate(new Pose2d(0, 0, Math.toRadians(0)));
             resetRuntime();
             while (getRuntime()<1) {
@@ -462,9 +472,9 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
                         xforlast = -1 * tag.ftcPose.y;
                         yforlast = tag.ftcPose.x;
 
-                        if (idforapril == 4) {
+                        if (idforapril == 1) {
                             trajApril = drive.trajectoryBuilder(new Pose2d())
-                                    .lineToConstantHeading(new Vector2d(xforlast+2, yforlast))
+                                    .lineToConstantHeading(new Vector2d(xforlast-0.5, yforlast-0.5))
 
                                     .build();
                             hello = true;
@@ -493,9 +503,9 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
                             xforlast = -1 * tag.ftcPose.y;
                             yforlast = tag.ftcPose.x;
 
-                            if (idforapril == 4) {
+                            if (idforapril == 1) {
                                 trajApril = drive.trajectoryBuilder(new Pose2d())
-                                        .lineToConstantHeading(new Vector2d(xforlast+2, yforlast))
+                                        .lineToConstantHeading(new Vector2d(xforlast-0.5, yforlast))
 
                                         .build();
                                 hello = true;
@@ -516,25 +526,27 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
             frontRightMotor.setPower(-0.2);
             backLeftMotor.setPower(-0.2);
             backRightMotor.setPower(-0.2);
-            sleep(1000);
+            sleep(500);
             drive.setPoseEstimate(new Pose2d(0, 0, Math.toRadians(0)));
             sleep(200);
             pixelOut.setPosition(0);
+            sleep(500);
             intakeRotate.setPower(-0.1);
-            sleep(1000);
             pixelIn.setPower(-1);
-            sleep(1000);
+            sleep(400);
             drive.followTrajectory(traj1d);
-            sleep(200);
-            linearSlideLeft.setPower(-0.5);
-            linearSlideRight.setPower(-0.5);
-            sleep(600);
+            linearSlideLeft.setPower(-1);
+            linearSlideRight.setPower(-1);
+            sleep(400);
             linearSlideLeft.setPower(0);
             linearSlideRight.setPower(0);
+            intakeRotate.setPower(0.2);
+            intakeMove.setPower(1);
+            sleep(1000);
+            intakeMove.setPower(0);
 
 
         }
-
         if (auto ==2){
             pixelOut.setPosition(0.8);
             drive.followTrajectorySequence(trajSeq2);
@@ -548,9 +560,10 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
                         xforlast = -1 * tag.ftcPose.y;
                         yforlast = tag.ftcPose.x;
 
-                        if (idforapril == 5) {
+                        if (idforapril == 2) {
                             trajApril = drive.trajectoryBuilder(new Pose2d())
-                                    .lineToConstantHeading(new Vector2d(xforlast, yforlast))
+                                    .lineToConstantHeading(new Vector2d(xforlast-0.5, yforlast))
+
                                     .build();
                             hello = true;
                         }
@@ -578,9 +591,9 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
                             xforlast = -1 * tag.ftcPose.y;
                             yforlast = tag.ftcPose.x;
 
-                            if (idforapril == 5) {
+                            if (idforapril == 2) {
                                 trajApril = drive.trajectoryBuilder(new Pose2d())
-                                        .lineToConstantHeading(new Vector2d(xforlast, yforlast))
+                                                .lineToConstantHeading(new Vector2d(xforlast-0.5, yforlast))
 
                                         .build();
                                 hello = true;
@@ -597,27 +610,30 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
                 }
             }
 
-
-
             frontLeftMotor.setPower(-0.2);
             frontRightMotor.setPower(-0.2);
             backLeftMotor.setPower(-0.2);
             backRightMotor.setPower(-0.2);
-            sleep(1000);
+            sleep(500);
             drive.setPoseEstimate(new Pose2d(0, 0, Math.toRadians(0)));
             sleep(200);
             pixelOut.setPosition(0);
+            sleep(500);
             intakeRotate.setPower(-0.1);
-            sleep(1000);
             pixelIn.setPower(-1);
-            sleep(1000);
+            sleep(400);
             drive.followTrajectory(traj1d);
-            sleep(200);
-            linearSlideLeft.setPower(-0.5);
-            linearSlideRight.setPower(-0.5);
-            sleep(600);
+            linearSlideLeft.setPower(-1);
+            linearSlideRight.setPower(-1);
+            sleep(400);
             linearSlideLeft.setPower(0);
             linearSlideRight.setPower(0);
+            intakeRotate.setPower(0.2);
+            intakeMove.setPower(1);
+            sleep(1000);
+            intakeMove.setPower(0);
+
+
 
 
 
@@ -634,9 +650,9 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
                         xforlast = -1 * tag.ftcPose.y;
                         yforlast = tag.ftcPose.x;
 
-                        if (idforapril == 6) {
+                        if (idforapril == 3) {
                             trajApril = drive.trajectoryBuilder(new Pose2d())
-                                    .lineToConstantHeading(new Vector2d(xforlast, yforlast))
+                                    .lineToConstantHeading(new Vector2d(xforlast-0.5, yforlast))
 
                                     .build();
                             hello = true;
@@ -665,9 +681,9 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
                             xforlast = -1 * tag.ftcPose.y;
                             yforlast = tag.ftcPose.x;
 
-                            if (idforapril == 6) {
+                            if (idforapril == 3) {
                                 trajApril = drive.trajectoryBuilder(new Pose2d())
-                                        .lineToConstantHeading(new Vector2d(xforlast, yforlast))
+                                        .lineToConstantHeading(new Vector2d(xforlast-0.5, yforlast))
 
                                         .build();
                                 hello = true;
@@ -684,33 +700,33 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
                 }
             }
 
-            //frontLeftMotor.setPower(-0.2);
-            //frontRightMotor.setPower(-0.2);
-            //backLeftMotor.setPower(-0.2);
-            //backRightMotor.setPower(-0.2);
-            sleep(1000);
+            frontLeftMotor.setPower(-0.2);
+            frontRightMotor.setPower(-0.2);
+            backLeftMotor.setPower(-0.2);
+            backRightMotor.setPower(-0.2);
+            sleep(500);
             drive.setPoseEstimate(new Pose2d(0, 0, Math.toRadians(0)));
             sleep(200);
             pixelOut.setPosition(0);
+            sleep(500);
             intakeRotate.setPower(-0.1);
-            sleep(500);
             pixelIn.setPower(-1);
-            sleep(500);
-            //drive.followTrajectory(traj1d);
-            sleep(200);
-            linearSlideLeft.setPower(-0.5);
-            linearSlideRight.setPower(-0.5);
-            sleep(300);
+            sleep(400);
+            drive.followTrajectory(traj1d);
+            linearSlideLeft.setPower(-1);
+            linearSlideRight.setPower(-1);
+            sleep(400);
             linearSlideLeft.setPower(0);
             linearSlideRight.setPower(0);
-            drive.followTrajectorySequence(trajSeq3back);
+            intakeRotate.setPower(0.2);
+            intakeMove.setPower(1);
+            sleep(1000);
+            intakeMove.setPower(0);
+
 
         }
 
         // Save more CPU resources when camera is no longer needed.
-        stackKnocker.setPower(-1);
-        sleep(350);
-        stackKnocker.setPower(0);
 
 
 
@@ -725,6 +741,7 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
      * Add telemetry about TensorFlow Object Detection (TFOD) recognitions.
      */
     private void telemetryTfod() {
+
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
 
@@ -740,11 +757,11 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
         }   // end for() loop
         if (currentRecognitions.size()!=0){
             for (Recognition recognition : currentRecognitions) {
-                if((recognition.getImageHeight()<=1.5* recognition.getImageWidth())&&(recognition.getImageWidth()<=1.5* recognition.getImageHeight())&&(recognition.getConfidence()>0.87)){
-                    if (((recognition.getLeft()+ recognition.getRight())/2)<200){
-                        auto=1;
+                if((recognition.getImageHeight()<=1.5* recognition.getImageWidth())&&(recognition.getImageWidth()<=1.5* recognition.getImageHeight())&&(recognition.getConfidence()>0.9)){
+                    if (((recognition.getLeft()+ recognition.getRight())/2)<300){
+                        auto=2;
                     } else {
-                        auto = 2;
+                        auto = 3;
                     }
 
                 } else {
@@ -757,32 +774,13 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
             }   // end for() loop
 
         }else {
-            auto =3;
+            auto =1;
             telemetry.addData("auto",auto);
             telemetry.update();
         }
 
-    }   // end method telemetryTfod()
 
-    private void telemetryPixel() {
-
-        List<Recognition> currentRecognitions = tfod.getRecognitions();
-        telemetry.addData("# Objects Detected", currentRecognitions.size());
-
-        // Step through the list of recognitions and display info for each one.
-        for (Recognition recognition : currentRecognitions) {
-            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
-            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
-
-            telemetry.addData(""," ");
-            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-            telemetry.addData("- Position", "%.0f / %.0f", x, y);
-            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
-            telemetry.update();
-        }   // end for() loop
-
-
-    }   // end method telemetryTfod()
+    }    // end method telemetryTfod()
     private void initDoubleVision() {
         // -----------------------------------------------------------------------------------------
         // AprilTag Configuration
@@ -889,4 +887,5 @@ public class RBAPT23_Edge_Stack extends LinearOpMode {
 
         }
     }
+
 }   // end class
