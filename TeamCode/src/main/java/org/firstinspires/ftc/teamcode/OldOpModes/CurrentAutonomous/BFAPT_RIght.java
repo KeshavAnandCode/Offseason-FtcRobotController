@@ -38,7 +38,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.OldOpModes.drive.SampleMecanumDrive;
@@ -195,12 +194,12 @@ public class BFAPT_RIght extends LinearOpMode {
                 .build();
         Trajectory traj2f = drive.trajectoryBuilder(new Pose2d())
 
-                .lineToConstantHeading (new Vector2d(0,22))
+                .lineToConstantHeading (new Vector2d(0,23))
 
                 .build();
         Trajectory traj3f = drive.trajectoryBuilder(new Pose2d())
 
-                .lineToConstantHeading (new Vector2d(0,18))
+                .lineToConstantHeading (new Vector2d(0,18.5))
 
                 .build();
         Trajectory traj1g = drive.trajectoryBuilder(new Pose2d())
@@ -260,12 +259,9 @@ public class BFAPT_RIght extends LinearOpMode {
                 .build();
         boolean d= true;
         while (!opModeIsActive()) {
-            telemetry.addData("DS preview on/off","3 dots, Camera Stream");
-            telemetry.addLine();
-            telemetry.addLine("----------------------------------------");
-            telemetry.addData("auto",auto);
-            telemetry.update();
+            telemetryTfod();
         }
+
 
 
 
@@ -496,7 +492,6 @@ public class BFAPT_RIght extends LinearOpMode {
      * Add telemetry about TensorFlow Object Detection (TFOD) recognitions.
      */
     private void telemetryTfod() {
-
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
 
@@ -523,15 +518,16 @@ public class BFAPT_RIght extends LinearOpMode {
                     idle();
                 }
 
-            telemetry.addData("auto",auto);
+                telemetry.addData("auto",auto);
                 telemetry.addData("confonf",recognition.getConfidence());
+                telemetry.update();
             }   // end for() loop
-            telemetry.addData("auto",auto);
+
         }else {
             auto =3;
+            telemetry.addData("auto",auto);
+            telemetry.update();
         }
-
-        telemetry.addData("auto",auto);
 
     }   // end method telemetryTfod()
     private void initDoubleVision() {
@@ -566,7 +562,7 @@ public class BFAPT_RIght extends LinearOpMode {
                     .build();
         } else {
             myVisionPortal = new VisionPortal.Builder()
-                    .setCamera(BuiltinCameraDirection.BACK)
+                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 2"))
                     .addProcessors(tfod, aprilTag)
                     .build();
         }

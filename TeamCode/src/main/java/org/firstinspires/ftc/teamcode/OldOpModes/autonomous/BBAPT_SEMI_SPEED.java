@@ -42,6 +42,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.Autonomous.SleepTime;
 import org.firstinspires.ftc.teamcode.OldOpModes.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.OldOpModes.drive.opmode.LinearSlidePosition;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -601,6 +602,8 @@ public class BBAPT_SEMI_SPEED extends LinearOpMode {
 
 
         waitForStart();
+
+        sleep(SleepTime.SLEEP);
 
         if (opModeIsActive()) {
             xxx = true;
