@@ -35,6 +35,9 @@ public class Robot {
     public DcMotorEx linearSlideLeft;
     public DcMotorEx linearSlideRight;
     public DcMotorEx intakeMotor;
+    public DcMotorEx leftOdo;
+    public DcMotorEx rightOdo;
+    public DcMotorEx sideOdo;
     public DcMotorEx linearActuator;
 
 
@@ -65,6 +68,11 @@ public class Robot {
         stackKnocker = hardwareMap.crservo.get("stackKnocker");
         stack = hardwareMap.servo.get("Stack");
 
+        leftOdo = hardwareMap.get(DcMotorEx.class, "frontLeftMotor");
+        rightOdo = hardwareMap.get(DcMotorEx.class, "backRightMotor");
+        sideOdo = hardwareMap.get(DcMotorEx.class, "backLeftMotor");
+
+
         linearSlideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         linearSlideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMove.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -81,6 +89,8 @@ public class Robot {
         backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightOdo.setDirection(DcMotorSimple.Direction.REVERSE);
+        sideOdo.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
 

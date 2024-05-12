@@ -1,10 +1,5 @@
 package org.firstinspires.ftc.teamcode.Teleop.OpModes;
 
-import static org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Hang.INITIAL_LOOSEN_TIME;
-import static org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Hang.SECOND_LOOSEN_TIME;
-import static org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Hang.TIGHTEN_TIME;
-import static org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Hang.UP_TIME;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -15,6 +10,7 @@ import com.arcrobotics.ftclib.gamepad.ToggleButtonReader;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Autonomous.Localizer;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.ColorSensors;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.GamepadJoystickCurve;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Hang;
@@ -23,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Intaking
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Lights;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Robot;
 
+import java.util.ArrayList;
 import java.util.List;
 @Config
 @TeleOp
@@ -44,6 +41,14 @@ public class Drive extends LinearOpMode {
     boolean hang = false;
     double hangTimestamp = 0.0;
     double oldMosaicTimestamp = 0.0;
+
+    double startingX = 0;
+    double startingY = 0;
+    double startingHeading = Math.toRadians(90);
+
+    List<Double> positionList = new ArrayList<>();
+
+    int ticker = 0;
 
     Robot robot;
 
@@ -109,6 +114,12 @@ public class Drive extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
+
+            ticker ++;
+
+
+
+
 
             //Drivetrain:
 
@@ -346,6 +357,17 @@ public class Drive extends LinearOpMode {
             g2LB.readValue();
             g2RB.readValue();
 
+            //Localization
+
+            if (ticker==1){
+                positionList = Localizer.getInstance().pos(robot,startingX,startingY,startingHeading,0,0,0);
+            } else {
+                positionList = Localizer.getInstance().pos(
+                        robot, positionList.get(3),positionList.get(4), positionList.get(5),
+                        positionList.get(0),positionList.get(1),positionList.get(2))
+                ;
+            }
+
 
 
 
@@ -378,10 +400,23 @@ public class Drive extends LinearOpMode {
                 tele.addLine("Use FTC Dash to select telmetry");
                 tele.addLine("1 = Motor Power");
                 tele.addLine("2 = Color Sensors");
+                tele.addLine("3 = Intake Servo Position");
+                tele.addLine("4 = Ticker (Frame Count)");
+                tele.addLine("5 = Localization");
                 tele.update();
             }
             if(TELEMETRY==3){
                 tele.addLine(String.valueOf(robot.stack.getPosition()));
+                tele.update();
+            }
+            if (TELEMETRY==4){
+                tele.addLine(String.valueOf(ticker));
+                tele.update();
+            }
+            if (TELEMETRY==5){
+                tele.addLine("x: " + positionList.get(3));
+                tele.addLine("y: " + positionList.get(4));
+                tele.addLine("heading: " + Math.toRadians(positionList.get(5)));
                 tele.update();
             }
 
