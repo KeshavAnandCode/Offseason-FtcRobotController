@@ -1,10 +1,5 @@
 package org.firstinspires.ftc.teamcode.Teleop.OpModes;
 
-import static org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Hang.INITIAL_LOOSEN_TIME;
-import static org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Hang.SECOND_LOOSEN_TIME;
-import static org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Hang.TIGHTEN_TIME;
-import static org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Hang.UP_TIME;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -44,6 +39,9 @@ public class Drive extends LinearOpMode {
     boolean hang = false;
     double hangTimestamp = 0.0;
     double oldMosaicTimestamp = 0.0;
+
+
+    int ticker = 0;
 
     Robot robot;
 
@@ -109,6 +107,12 @@ public class Drive extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
+
+            ticker ++;
+
+
+
+
 
             //Drivetrain:
 
@@ -350,6 +354,8 @@ public class Drive extends LinearOpMode {
 
 
 
+
+
             //Telemetry
 
             if (TELEMETRY==2){
@@ -378,12 +384,20 @@ public class Drive extends LinearOpMode {
                 tele.addLine("Use FTC Dash to select telmetry");
                 tele.addLine("1 = Motor Power");
                 tele.addLine("2 = Color Sensors");
+                tele.addLine("3 = Intake Servo Position");
+                tele.addLine("4 = Ticker (Frame Count)");
+                tele.addLine("5 = Localization");
                 tele.update();
             }
             if(TELEMETRY==3){
                 tele.addLine(String.valueOf(robot.stack.getPosition()));
                 tele.update();
             }
+            if (TELEMETRY==4){
+                tele.addLine(String.valueOf(ticker));
+                tele.update();
+            }
+
 
 
 
