@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Autonomous.RR.MecanumDrive;
 
-@Disabled
+
 @Autonomous
 public class CallOpenCv extends LinearOpMode {
     @Override
@@ -25,7 +25,6 @@ public class CallOpenCv extends LinearOpMode {
         waitForStart();
 
         if (isStopRequested()) return;
-
 
     }
 }
