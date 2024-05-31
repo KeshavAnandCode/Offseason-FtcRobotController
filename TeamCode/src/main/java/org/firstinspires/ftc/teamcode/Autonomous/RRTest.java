@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Autonomous.RR.MecanumDrive;
 
 @Disabled
 @Autonomous
-public class Test extends LinearOpMode {
+public class RRTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
