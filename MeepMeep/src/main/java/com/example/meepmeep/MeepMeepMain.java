@@ -27,5 +27,6 @@ public class MeepMeepMain {
                 .setBackgroundAlpha(0.95f)
                 .addEntity(myBot)
                 .start();
+
     }
 }
