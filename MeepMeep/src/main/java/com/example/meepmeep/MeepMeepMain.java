@@ -15,9 +15,8 @@ public class MeepMeepMain {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(60, 60, Math.toRadians(0)))
-                .setTangent(0)
-                .splineToSplineHeading(new Pose2d(45, 45, Math.toRadians(90)), Math.toRadians(90))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(101, 10, Math.toRadians(10)))
+                .strafeToLinearHeading(new Vector2d(1, 1), Math.toRadians(1))
                 .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)
