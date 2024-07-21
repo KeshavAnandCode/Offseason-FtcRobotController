@@ -32,6 +32,10 @@ public class GamepadJoystickCurve {
                 }
                 return returner;
             }
+        } else if (Objects.equals(CURVE, "GUEST")){
+
+            double returner = DEGREE* input;
+            return returner;
         }
         return input;
     }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons;
 
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,6 +13,7 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Autonomous.RR.MecanumDrive;
 
 public class Robot {
     public DcMotorEx frontLeftMotor;
@@ -36,6 +38,8 @@ public class Robot {
     public DcMotorEx linearSlideRight;
     public DcMotorEx intakeMotor;
     public DcMotorEx linearActuator;
+
+    public MecanumDrive drive;
 
 
     public Telemetry telemetry;
@@ -85,6 +89,9 @@ public class Robot {
         backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+
 
 
 
