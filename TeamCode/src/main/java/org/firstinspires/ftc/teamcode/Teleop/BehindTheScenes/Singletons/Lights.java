@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 import java.util.List;
 
 public class Lights {
@@ -27,13 +29,15 @@ public class Lights {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
         } else if (intaking) {
 
-            if (colorSensorList.get(2) == "red") {
-                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_RED);
-            } else if (colorSensorList.get(2) == "yellow") {
-                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-            } else if (colorSensorList.get(2) == "green") {
-                robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SKY_BLUE);
-            }
+                if (colorSensorList.get(2) == "red") {
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_RED);
+                } else if (colorSensorList.get(2) == "yellow") {
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+                } else if (colorSensorList.get(2) == "green") {
+                    robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SKY_BLUE);
+                }
+
+
         } else if (colorSensorList.get(0) == "white!") {
             robot.lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.WHITE);
         } else if (colorSensorList.get(0) == "yellow!") {

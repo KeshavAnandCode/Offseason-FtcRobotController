@@ -27,7 +27,7 @@ public class Hang {
             robot.linearActuator.setPower(1);
         } else if (time < TIGHTEN_TIME+INITIAL_LOOSEN_TIME+UP_TIME) {
             robot.linearActuator.setPower(0);
-            robot.linActServo.setPower(-1);
+            robot.linActServo.setPower(-0.4);
         } else if (time < SECOND_LOOSEN_TIME+TIGHTEN_TIME+INITIAL_LOOSEN_TIME+UP_TIME) {
             robot.linActServo.setPower(1);
         } else {

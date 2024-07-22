@@ -10,6 +10,8 @@ import com.arcrobotics.ftclib.gamepad.ToggleButtonReader;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.ColorSensors;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.GamepadJoystickCurve;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Hang;
@@ -19,9 +21,10 @@ import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Lights;
 import org.firstinspires.ftc.teamcode.Teleop.BehindTheScenes.Singletons.Robot;
 
 import java.util.List;
+
 @Config
 @TeleOp
-public class Drive extends LinearOpMode {
+public class Drive_Automatic extends LinearOpMode {
 
     public static String CURVE = "LINEAR";
     public static double DEGREE = 1;
@@ -34,11 +37,20 @@ public class Drive extends LinearOpMode {
     double doubleDropTimestamp = 0;
     boolean doubleDrop = false;
     boolean linearSlideMode = false;
+
+    boolean Up = false;
+    boolean Down = false;
+    boolean linearDown = false;
+
+    double upTimestamp = 0.0;
+    double downTimestamp = 0.0;
     boolean intakeLights = false;
     double intakeTimestamp = -90.0;
     boolean hang = false;
     double hangTimestamp = 0.0;
     double oldMosaicTimestamp = 0.0;
+
+    double slides = 800;
 
 
     int ticker = 0;
@@ -89,6 +101,14 @@ public class Drive extends LinearOpMode {
                 g2, GamepadKeys.Button.LEFT_BUMPER
         );
 
+        ButtonReader up = new ButtonReader(
+                g2, GamepadKeys.Button.DPAD_UP
+        );
+
+
+        ButtonReader down = new ButtonReader(
+                g2, GamepadKeys.Button.DPAD_DOWN
+        );
 
         ToggleButtonReader oldMosaic = new ToggleButtonReader(
                 g2, GamepadKeys.Button.START
@@ -140,32 +160,14 @@ public class Drive extends LinearOpMode {
             robot.backRightMotor.setPower(backRightPower);
 
 
-            //Linear Slides:
 
-            if (robot.linearSlideLeft.getCurrentPosition()>LINEARSLIDE_LOCK_POS) {
-                linearSlideMode = true;
-            } else {
-                linearSlideMode = false;
-            }
 
-            if (gamepad2.right_trigger != 0) {
-                robot.linearSlideLeft.setPower(gamepad2.right_trigger);
-                robot.linearSlideRight.setPower(gamepad2.right_trigger);
-            } else if (gamepad2.left_trigger != 0) {
-                robot.linearSlideLeft.setPower(-gamepad2.left_trigger);
-                robot.linearSlideRight.setPower(-gamepad2.left_trigger);
-            } else if (linearSlideMode) {
-                robot.linearSlideLeft.setPower(0.1);
-                robot.linearSlideRight.setPower(0.1);
-            } else {
-                robot.linearSlideLeft.setPower(0);
-                robot.linearSlideRight.setPower(0);
-            }
 
         
             //Single Drop
 
             if (g2X.wasJustPressed()){
+                slides = robot.linearSlideLeft.getCurrentPosition();
               singleDropTimestamp = getRuntime();
               singleDrop = true;
             }
@@ -191,6 +193,7 @@ public class Drive extends LinearOpMode {
             //Double Drop
 
             if (g2Y.wasJustPressed()){
+                slides = robot.linearSlideLeft.getCurrentPosition();
                 doubleDropTimestamp = getRuntime();
                 doubleDrop = true;
             }
@@ -309,25 +312,122 @@ public class Drive extends LinearOpMode {
 //            }
 
             
-            //Arm
+            //Arm + Slides
 
-            if (-gamepad2.left_stick_y>0) {
-                robot.intakeRotate.setPower(0.1);
-                robot.intakeMove.setPower(-gamepad2.left_stick_y*0.5);
-                robot.stack.setPosition(0.8);
-            } else if (-gamepad2.left_stick_y<0) {
-                robot.intakeRotate.setPower(-0.1);
-                robot.intakeMove.setPower(-gamepad2.left_stick_y*0.5);
-            }  else {
-                robot.intakeRotate.setPower(0);
-                robot.intakeMove.setPower(0);
+            if (up.wasJustPressed()){
+                upTimestamp = getRuntime();
+                Up = true;
+            }
+
+            up.readValue();
+
+            if (down.wasJustPressed()){
+                Down = true;
+            }
+
+            down.readValue();
+
+            if (Up) {
+                double upTime = getRuntime()- upTimestamp;
+
+                if (upTime<1 || robot.linearSlideLeft.getCurrentPosition()<slides-100) {
+                    if (upTime < 1) {
+                        robot.intakeRotate.setPower(0.1);
+                        robot.stack.setPosition(0.8);
+                        robot.intakeMove.setPower(1);
+
+                    }
+
+                    if (robot.linearSlideLeft.getCurrentPosition() < slides - 100) {
+
+                        robot.linearSlideLeft.setPower(1);
+                        robot.linearSlideRight.setPower(1);
+
+                    } else {
+                        robot.linearSlideLeft.setPower(0);
+                        robot.linearSlideRight.setPower(0);
+                    }
+                } else {
+
+                     Up = false;
+                 }
+            }
+
+            else if (Down) {
+
+                if (robot.linearSlideLeft.getCurrentPosition()>150){
+
+                    robot.linearSlideLeft.setPower(-1);
+                    robot.linearSlideRight.setPower(-1);
+
+                } else {
+                    linearDown = true;
+                    downTimestamp = getRuntime();
+                    Down = false;
+                }
+
+            }
+
+            else if (linearDown) {
+
+                double downTime = getRuntime() - downTimestamp;
+
+                if (downTime<0.7) {
+                    robot.intakeRotate.setPower(-0.1);
+                    robot.intakeMove.setPower(-1);
+                } else {
+                    linearDown = false;
+                }
+            }
+
+            else {
+
+                //Arm:
+
+                if (-gamepad2.left_stick_y > 0) {
+                    robot.intakeRotate.setPower(0.1);
+                    robot.intakeMove.setPower(-gamepad2.left_stick_y * 0.5);
+                    robot.stack.setPosition(0.8);
+                } else if (-gamepad2.left_stick_y < 0){
+
+                    if (robot.linearSlideLeft.getCurrentPosition()<50) {
+                        robot.intakeRotate.setPower(-0.1);
+                        robot.intakeMove.setPower(-gamepad2.left_stick_y * 0.5);
+                    }
+
+                } else {
+                    robot.intakeRotate.setPower(0);
+                    robot.intakeMove.setPower(0);
+                }
+
+                //Linear Slides:
+
+                if (robot.linearSlideLeft.getCurrentPosition()>LINEARSLIDE_LOCK_POS) {
+                    linearSlideMode = true;
+                } else {
+                    linearSlideMode = false;
+                }
+
+                if (gamepad2.right_trigger != 0) {
+                    robot.linearSlideLeft.setPower(gamepad2.right_trigger);
+                    robot.linearSlideRight.setPower(gamepad2.right_trigger);
+                } else if (gamepad2.left_trigger != 0) {
+                        robot.linearSlideLeft.setPower(-gamepad2.left_trigger);
+                        robot.linearSlideRight.setPower(-gamepad2.left_trigger);
+
+                } else if (linearSlideMode) {
+                    robot.linearSlideLeft.setPower(0.1);
+                    robot.linearSlideRight.setPower(0.1);
+                } else {
+                    robot.linearSlideLeft.setPower(0);
+                    robot.linearSlideRight.setPower(0);
+                }
+
             }
 
             //Intake Servo:
 
-            if (gamepad2.dpad_down){
-                robot.stack.setPosition(0.08);
-            }
+
             if (gamepad2.dpad_up){
                 robot.stack.setPosition(0.8);
             }
@@ -381,12 +481,12 @@ public class Drive extends LinearOpMode {
             }
 
             if (TELEMETRY==0){
-                tele.addLine("Use FTC Dash to select telmetry");
+                tele.addLine("Use FTC Dash to select telemetry");
                 tele.addLine("1 = Motor Power");
                 tele.addLine("2 = Color Sensors");
                 tele.addLine("3 = Intake Servo Position");
                 tele.addLine("4 = Ticker (Frame Count)");
-                tele.addLine("5 = Localization");
+                tele.addLine("5 = Current of Intake Motor");
                 tele.update();
             }
             if(TELEMETRY==3){
@@ -397,6 +497,8 @@ public class Drive extends LinearOpMode {
                 tele.addLine(String.valueOf(ticker));
                 tele.update();
             }
+
+
 
 
 
